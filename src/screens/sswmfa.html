@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Server Side Web Modelling for Augmentations</title>
+    <meta name="description" content="Server Side Web Modelling for Augmentations" />
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="../gojs/assets/css/jquery-ui.min.css" />
+    <script src="../gojs/assets/js/jquery.min.js"></script>
+    <script src="../gojs/assets/js/jquery-ui.min.js"></script>
+    <script src="../gojs/release/go.js"></script>
+
+    <link rel='stylesheet' href='../gojs/extensions/DataInspector.css' />
+    <script src="../gojs/extensions/DataInspector.js"></script>
+    <link rel='stylesheet' href='../css/style.css' />
+    <link rel="stylesheet" href="../bootstrap-4.0.0-alpha.6-dist/css/bootstrap.min.css"/>
+    <script src="../bootstrap-4.0.0-alpha.6-dist/js/bootstrap.min.js"></script>
+
+    <script id="DBMCode" src="../js/erModelling.js"></script>
+    <script id="NavMCode" src="../js/navModelling.js"></script>
+</head>
+<body onload="initNavM()">
+
+<div id="navModelling">
+  <div class="pdContainer">
+    <span class="paletteSpan">
+      <div id="navPaletteDiv" class="pdDiv"></div>
+    </span>
+
+    <span class="diagramSpan">
+      <div id="navDiagramDiv" class="pdDiv"></div>
+    </span>
+  </div>
+  <div id="infoDraggable" class="draggable">
+    <div id="infoDraggableHandle" class="handle">Info</div>
+    <div>
+    <div id="myInfo"></div>
+    </div>
+  </div>
+  <div>
+    <div>
+      <button id="SaveButton" onclick="save()">Save</button>
+      <button onclick="load()">Load</button>key
+      Diagram Model saved in JSON format:
+    </div>
+    <textarea id="mySavedModel">
+      { "class": "go.GraphLinksModel",
+        "nodeDataArray": [
+       ],
+        "linkDataArray": [
+       ]}
+    </textarea>
+  </div>
+</div>
+
+</body>
+</html>

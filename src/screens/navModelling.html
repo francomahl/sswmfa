@@ -1,0 +1,31 @@
+<div id="navModelling">
+  <div class="pdContainer">
+    <span class="paletteSpan">
+      <div id="navPaletteDiv" class="pdDiv"></div>
+    </span>
+
+    <span class="diagramSpan">
+      <div id="navDiagramDiv" class="pdDiv"></div>
+    </span>
+  </div>
+  <div id="infoDraggable" class="draggable">
+    <div id="infoDraggableHandle" class="handle">Info</div>
+    <div>
+    <div id="myInfo"></div>
+    </div>
+  </div>
+  <div>
+    <div>
+      <button id="SaveButton" onclick="save()">Save</button>
+      <button onclick="load()">Load</button>key
+      Diagram Model saved in JSON format:
+    </div>
+    <textarea id="mySavedModel">
+      { "class": "go.GraphLinksModel",
+        "nodeDataArray": [
+       ],
+        "linkDataArray": [
+       ]}
+    </textarea>
+  </div>
+</div>

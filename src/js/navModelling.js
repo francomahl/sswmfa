@@ -263,12 +263,12 @@ navDiagram.groupTemplateMap.add("OfNodes",
   // add nodes, including groups, and links to the model
   navDiagram.model = new go.GraphLinksModel(
   [ // node data
-    { key: "A", icon:"../gojs/samples/images/openFolder.png", name:"unNombre", color: colors["blue"], fig: "Hexagon", group: "Master Page", loc: new go.Point(320, 100) },
-    { key: "B", icon:"../gojs/samples/images/55x55.png", name:"unNombre", color: colors["orange"], fig: "RoundRectangle", group: "Master Page", loc: new go.Point(420, 200) },
-    { key: "D", icon:"../gojs/samples/images/55x55.png", name:"unNombre", color: colors["orange"], fig: "RoundRectangle", group: "Home Page", loc: new go.Point(270, 325) },
-    { key: "F", icon:"../gojs/samples/images/55x55.png", name:"unNombre", color: colors["blue"], fig: "Hexagon", group: "Home Page", loc: new go.Point(200, 350) },
-    { key: "G", icon:"../gojs/samples/images/55x55.png", name:"unNombre", color: colors["orange"], fig: "RoundRectangle", group: "Home Page", loc: new go.Point(180, 450) },
-    { key: "H", icon:"../gojs/samples/images/55x55.png", name:"unNombre", color: colors["blue"], fig: "Hexagon", loc: new go.Point(180, 450) },
+    { key: "A", icon:"src/gojs/samples/images/openFolder.png", name:"unNombre", color: colors["blue"], fig: "Hexagon", group: "Master Page", loc: new go.Point(320, 100) },
+    { key: "B", icon:"src/gojs/samples/images/55x55.png", name:"unNombre", color: colors["orange"], fig: "RoundRectangle", group: "Master Page", loc: new go.Point(420, 200) },
+    { key: "D", icon:"src/gojs/samples/images/55x55.png", name:"unNombre", color: colors["orange"], fig: "RoundRectangle", group: "Home Page", loc: new go.Point(270, 325) },
+    { key: "F", icon:"src/gojs/samples/images/55x55.png", name:"unNombre", color: colors["blue"], fig: "Hexagon", group: "Home Page", loc: new go.Point(200, 350) },
+    { key: "G", icon:"src/gojs/samples/images/55x55.png", name:"unNombre", color: colors["orange"], fig: "RoundRectangle", group: "Home Page", loc: new go.Point(180, 450) },
+    { key: "H", icon:"src/gojs/samples/images/55x55.png", name:"unNombre", color: colors["blue"], fig: "Hexagon", loc: new go.Point(180, 450) },
     { key: "Master Page", isGroup: true, category:"OfNodes" },
     { key: "Main content", isGroup: true, category:"OfGroups"  },
     { key: "Home Page", isGroup: true, category:"OfNodes", group: "Main content" }
@@ -455,20 +455,20 @@ function getInfo(model, obj) {
   return text;
 }
 // Show the diagram's model in JSON format that the user may edit
-function save() {
-  saveDiagramProperties();  // do this first, before writing to JSON
-  document.getElementById("mySavedModel").value = navDiagram.model.toJson();
+function saveNav() {
+  saveNavDiagramProperties();  // do this first, before writing to JSON
+  document.getElementById("mySavedNavModel").value = navDiagram.model.toJson();
   navDiagram.isModified = false;
 }
-function load() {
-  navDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
-  loadDiagramProperties();  // do this after the Model.modelData has been brought into memory
+function loadNav() {
+  navDiagram.model = go.Model.fromJson(document.getElementById("mySavedNavModel").value);
+  loadNavDiagramProperties();  // do this after the Model.modelData has been brought into memory
 }
 
-function saveDiagramProperties() {
+function saveNavDiagramProperties() {
   navDiagram.model.modelData.position = go.Point.stringify(navDiagram.position);
 }
-function loadDiagramProperties(e) {
+function loadNavDiagramProperties(e) {
   // set Diagram.initialPosition, not Diagram.position, to handle initialization side-effects
   var pos = navDiagram.model.modelData.position;
   if (pos) navDiagram.initialPosition = go.Point.parse(pos);

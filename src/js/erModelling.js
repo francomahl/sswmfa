@@ -25,7 +25,7 @@ function initDBM() {
 
     // when the document is modified, add a "*" to the title and enable the "Save" button
     erDiagram.addDiagramListener("Modified", function(e) {
-      var button = document.getElementById("SaveButton");
+      var button = document.getElementById("SaveERButton");
       if (button) button.disabled = !erDiagram.isModified;
       var idx = document.title.indexOf("*");
       if (erDiagram.isModified) {
@@ -139,12 +139,12 @@ function initDBM() {
             )
           ),
           GO(go.Panel, "Vertical",
+           new go.Binding("itemArray", "properties"),
             {
               row: 2, margin: 3, stretch: go.GraphObject.Fill,
               defaultAlignment: go.Spot.Left, background: "lightyellow",
               itemTemplate: propertyTemplate
-            },
-            new go.Binding("itemArray", "properties")
+            }
           )
         )
       );
@@ -187,7 +187,7 @@ function initDBM() {
           new go.Binding("text", "toText").makeTwoWay())
       );
 
-    load();  // load an initial diagram from some JSON text
+    loadER();  // load an initial diagram from some JSON text
 
     // initialize the Palette that is on the left side of the page
     erPalette =
@@ -219,12 +219,12 @@ function initDBM() {
                       itemTemplate:
                           GO(go.Panel, "Horizontal",
                             GO(go.TextBlock,
-                              new go.Binding("text", "name").makeTwoWay()),
+                              new go.Binding("text", "name")),
                             // property type
                             GO(go.TextBlock, ":",
                               {editable: false}),
                             GO(go.TextBlock,
-                              new go.Binding("text", "type").makeTwoWay())
+                              new go.Binding("text", "type"))
                           )
                     }
                   )
@@ -235,24 +235,30 @@ function initDBM() {
               properties: [{ name: "property", type: "type" }]}
           ])
         });
+
+    erDiagram.model = GO(go.GraphLinksModel,
+      {
+        copiesArrays: true,
+        copiesArrayObjects: true
+      });
   }
 
 
   // Show the diagram's model in JSON format that the user may edit
-  function save() {
-    saveDiagramProperties();  // do this first, before writing to JSON
-    document.getElementById("mySavedModel").value = erDiagram.model.toJson();
+  function saveER() {
+    saveERDiagramProperties();  // do this first, before writing to JSON
+    document.getElementById("mySavedERModel").value = erDiagram.model.toJson();
     erDiagram.isModified = false;
   }
-  function load() {
-    erDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
-    loadDiagramProperties();  // do this after the Model.modelData has been brought into memory
+  function loadER() {
+    erDiagram.model = go.Model.fromJson(document.getElementById("mySavedERModel").value);
+    loadERDiagramProperties();  // do this after the Model.modelData has been brought into memory
   }
 
-  function saveDiagramProperties() {
+  function saveERDiagramProperties() {
     erDiagram.model.modelData.position = go.Point.stringify(erDiagram.position);
   }
-  function loadDiagramProperties(e) {
+  function loadERDiagramProperties(e) {
     // set Diagram.initialPosition, not Diagram.position, to handle initialization side-effects
     var pos = erDiagram.model.modelData.position;
     if (pos) erDiagram.initialPosition = go.Point.parse(pos);

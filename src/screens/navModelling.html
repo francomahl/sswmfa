@@ -11,16 +11,16 @@
   <div id="infoDraggable" class="draggable">
     <div id="infoDraggableHandle" class="handle">Info</div>
     <div>
-    <div id="myInfo"></div>
+      <div id="myInfo"></div>
     </div>
   </div>
   <div>
     <div>
-      <button id="SaveButton" onclick="save()">Save</button>
-      <button onclick="load()">Load</button>key
+      <button id="SaveNavButton" onclick="saveNav()">Save</button>
+      <button onclick="loadNav()">Load</button>key
       Diagram Model saved in JSON format:
     </div>
-    <textarea id="mySavedModel">
+    <textarea id="mySavedNavModel" class="mySavedModel">
       { "class": "go.GraphLinksModel",
         "nodeDataArray": [
        ],

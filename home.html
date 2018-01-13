@@ -18,22 +18,21 @@
     <link rel="stylesheet" href="src/bootstrap-4.0.0-alpha.6-dist/css/bootstrap.min.css"/>
     <script src="src/bootstrap-4.0.0-alpha.6-dist/js/bootstrap.min.js"></script>
 
-    <script id="DBMCode" src="src/js/erModelling.js"></script>
-    <script id="NavMCode" src="src/js/navModelling.js"></script>
+    <script id="DBMCode" src="src/js/Models.js"></script>
 </head>
-<body onload="initNavM(); initDBM()">
+<body onload="init();">
 
 <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item">
-        <a class="nav-link active" data-toggle="tab" href="#erModel" role="tab">ER</a>
+        <a class="nav-link" data-toggle="tab" href="#erModel" role="tab">ER</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#navModel" role="tab">Navigation</a>
+        <a class="nav-link active" data-toggle="tab" href="#navModel" role="tab">Navigation</a>
     </li>
 </ul>
 
 <div class="tab-content">
-    <div class="tab-pane active" id="erModel" role="tabpanel">
+    <div class="tab-pane" id="erModel" role="tabpanel">
         <div id="erModelling">
           <div class="pdContainer">
             <span class="paletteSpan">
@@ -60,7 +59,7 @@
           </div>
         </div>
     </div>
-    <div class="tab-pane" id="navModel" role="tabpanel">
+    <div class="tab-pane active" id="navModel" role="tabpanel">
         <div id="navModelling">
           <div class="pdContainer">
             <span class="paletteSpan">

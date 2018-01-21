@@ -3,15 +3,6 @@ function init() {
 
   // ****** Navigation Diagram ******
 
-  // a collection of colors
-  var colors = {
-    blue:   "#00B5CB",
-    orange: "#F47321",
-    green:  "#C8DA2B",
-    gray:   "#888",
-    white:  "#F5F5F5"
-  };
-
   navDiagram =
     GO(go.Diagram, "navDiagramDiv",  // Diagram refers to its DIV HTML element by id
       {
@@ -59,8 +50,6 @@ function init() {
         "undoManager.isEnabled": true
       });
 
-  //******** Nav Diagram Logic ********
-
   // when the document is modified, add a "*" to the "Save" button
   navDiagram.addDiagramListener("Modified", function(e) {
       var button = $("#SaveNavButton");
@@ -81,6 +70,21 @@ function init() {
           button.text('Save');
       }
   });
+
+  //******** Nav Diagram Logic ********
+
+  //-------------------- Context Menu
+  // This is the actual HTML context menu:
+  var cxElement = document.getElementById("contextMenu");
+
+  // Since we have only one main element, we don't have to declare a hide method,
+  // we can set mainElement and GoJS will hide it automatically
+  var myContextMenu = GO(go.HTMLInfo, {
+    show: showContextMenu,
+    mainElement: cxElement
+  });
+  //-------------------- /Context Menu
+
     // There are two templates for Groups, "OfGroups" and "OfNodes".
 
     // Upon a drop onto a Group, we try to add the selection as members of the Group.
@@ -180,6 +184,7 @@ function init() {
   navDiagram.nodeTemplate =
     GO(go.Node, "Spot",
       {
+        contextMenu: myContextMenu,
         locationSpot: go.Spot.Center,
         fromSpot: go.Spot.AllSides,
         toSpot: go.Spot.AllSides,
@@ -199,7 +204,7 @@ function init() {
               portId: "", // the default port: if no spot on link data, use closest side
               fromLinkable: true, toLinkable: true, cursor: "pointer",
               strokeWidth: 4,
-              stroke: colors["gray"]
+              stroke: "gray"
             },
             new go.Binding("fill", "color").makeTwoWay(),
             new go.Binding("figure", "fig").makeTwoWay()),
@@ -290,8 +295,8 @@ function init() {
           groupTemplateMap: navDiagram.groupTemplateMap,
           layout: GO(go.GridLayout, { wrappingColumn: 1, alignment: go.GridLayout.Position }),
           model: new go.GraphLinksModel([  // specify the contents of the Palette
-            { key: "Action", fig: "Hexagon", color: colors["blue"] },
-            { key: "Module", fig: "RoundRectangle", color: colors["orange"] },
+            { key: "Action", fig: "Hexagon", color:"blue" },
+            { key: "Module", fig: "RoundRectangle", color: "orange" },
             { key: "New Group of nodes", isGroup: true, category:"OfNodes" },
             { key: "New Group of groups", isGroup: true, category:"OfGroups" }
           ])
@@ -308,6 +313,33 @@ function init() {
             }
           });
         });
+
+  //-------------------- Context Menu
+  navDiagram.contextMenu = myContextMenu;
+
+  // We don't want the div acting as a context menu to have a (browser) context menu!
+  cxElement.addEventListener("contextmenu", function(e) {
+    e.preventDefault();
+    return false;
+  }, false);
+
+  function showContextMenu(obj, diagram, tool) {
+    // Show only the relevant buttons given the current state.
+    var cmd = diagram.commandHandler;
+    document.getElementById("cut").style.display = cmd.canCutSelection() ? "block" : "none";
+    document.getElementById("copy").style.display = cmd.canCopySelection() ? "block" : "none";
+    document.getElementById("paste").style.display = cmd.canPasteSelection() ? "block" : "none";
+    document.getElementById("delete").style.display = cmd.canDeleteSelection() ? "block" : "none";
+    document.getElementById("color").style.display = (obj !== null ? "block" : "none");
+
+    // Now show the whole context menu element
+    cxElement.style.display = "block";
+    // we don't bother overriding positionContextMenu, we just do it here:
+    var mousePt = diagram.lastInput.viewPoint;
+    cxElement.style.left = mousePt.x + "px";
+    cxElement.style.top = mousePt.y + "px";
+  }
+  //-------------------- /Context Menu
 
   //******** ER Diagram Logic ********
 
@@ -390,8 +422,7 @@ function init() {
               font: "bold 12pt sans-serif",
               isMultiline: false, editable: true
             },
-            new go.Binding("text", "name").makeTwoWay(),
-            new go.Binding("text", "key").makeTwoWay()),
+            new go.Binding("text", "name").makeTwoWay()),
           // properties
           GO(go.Panel, "Horizontal",
             {
@@ -519,7 +550,45 @@ function init() {
         copiesArrayObjects: true
       });
 }
+//erClasses has the saved classes in erDiagram
+var erClasses = [];
 
+//---------------------------- Context Menu functions
+// This is the general menu command handler, parameterized by the name of the command.
+function cxcommand(event, val) {
+  if (val === undefined) val = event.currentTarget.id;
+  var diagram = navDiagram;
+  switch (val) {
+    case "cut": diagram.commandHandler.cutSelection(); break;
+    case "copy": diagram.commandHandler.copySelection(); break;
+    case "paste": diagram.commandHandler.pasteSelection(diagram.lastInput.documentPoint); break;
+    case "delete": diagram.commandHandler.deleteSelection(); break;
+    case "color": {
+//        var color = window.getComputedStyle(document.elementFromPoint(event.clientX, event.clientY).parentElement)['background-color'];
+          var text =   document.elementFromPoint(event.clientX, event.clientY).parentElement.textContent;
+//        changeColor(diagram, color); break;
+        console.log(text);
+    }
+  }
+  diagram.currentTool.stopTool();
+}
+
+// A custom command, for changing the color of the selected node(s).
+function changeColor(diagram, color) {
+  // Always make changes in a transaction, except when initializing the diagram.
+  diagram.startTransaction("change color");
+  diagram.selection.each(function(node) {
+    if (node instanceof go.Node) {  // ignore any selected Links and simple Parts
+        // Examine and modify the data, not the Node directly.
+        var data = node.data;
+        // Call setDataProperty to support undo/redo as well as
+        // automatically evaluating any relevant bindings.
+        diagram.model.setDataProperty(data, "color", color);
+    }
+  });
+  diagram.commitTransaction("change color");
+}
+//---------------------------- /Context Menu functions
 
 // Functions for highlighting, called by updateHighlights.
 // x in each case is the selected object or the object being treated as such.
@@ -686,6 +755,7 @@ function saveER() {
   saveERDiagramProperties();  // do this first, before writing to JSON
   document.getElementById("mySavedERModel").value = erDiagram.model.toJson();
   erDiagram.isModified = false;
+  erClasses = $.extend(true, [], erDiagram.model.nodeDataArray); //using JQuery's extend function to copy array value and not the reference
 }
 function loadER() {
   erDiagram.model = go.Model.fromJson(document.getElementById("mySavedERModel").value);

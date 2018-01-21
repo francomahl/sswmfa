@@ -296,7 +296,7 @@ function init() {
           layout: GO(go.GridLayout, { wrappingColumn: 1, alignment: go.GridLayout.Position }),
           model: new go.GraphLinksModel([  // specify the contents of the Palette
             { key: "Action", fig: "Hexagon", color:"blue" },
-            { key: "Module", fig: "RoundRectangle", color: "orange" },
+            { key: "Form", name: "Form1" , fig: "RoundRectangle", color: "orange" },
             { key: "New Group of nodes", isGroup: true, category:"OfNodes" },
             { key: "New Group of groups", isGroup: true, category:"OfGroups" }
           ])
@@ -326,12 +326,8 @@ function init() {
   function showContextMenu(obj, diagram, tool) {
     // Show only the relevant buttons given the current state.
     var cmd = diagram.commandHandler;
-    document.getElementById("cut").style.display = cmd.canCutSelection() ? "block" : "none";
-    document.getElementById("copy").style.display = cmd.canCopySelection() ? "block" : "none";
-    document.getElementById("paste").style.display = cmd.canPasteSelection() ? "block" : "none";
-    document.getElementById("delete").style.display = cmd.canDeleteSelection() ? "block" : "none";
-    document.getElementById("color").style.display = (obj !== null ? "block" : "none");
-
+    document.getElementById("notFound").style.display = (erClasses.length == 0) ? "block" : "none";
+    $(".erClass").css("display","block");
     // Now show the whole context menu element
     cxElement.style.display = "block";
     // we don't bother overriding positionContextMenu, we just do it here:
@@ -555,21 +551,11 @@ var erClasses = [];
 
 //---------------------------- Context Menu functions
 // This is the general menu command handler, parameterized by the name of the command.
-function cxcommand(event, val) {
+function cxcommand(classKey, val) {
   if (val === undefined) val = event.currentTarget.id;
   var diagram = navDiagram;
-  switch (val) {
-    case "cut": diagram.commandHandler.cutSelection(); break;
-    case "copy": diagram.commandHandler.copySelection(); break;
-    case "paste": diagram.commandHandler.pasteSelection(diagram.lastInput.documentPoint); break;
-    case "delete": diagram.commandHandler.deleteSelection(); break;
-    case "color": {
-//        var color = window.getComputedStyle(document.elementFromPoint(event.clientX, event.clientY).parentElement)['background-color'];
-          var text =   document.elementFromPoint(event.clientX, event.clientY).parentElement.textContent;
-//        changeColor(diagram, color); break;
-        console.log(text);
-    }
-  }
+  console.log(classKey);
+  console.log(val);
   diagram.currentTool.stopTool();
 }
 
@@ -589,6 +575,23 @@ function changeColor(diagram, color) {
   diagram.commitTransaction("change color");
 }
 //---------------------------- /Context Menu functions
+
+function resetUl(){
+    var len = erClasses.length;
+    $('#classes').empty();
+    $('#classes').append("<li id='notFound'> No classes found </li>");
+
+    if(len > 0){
+        for (i = 0; i < len; i++) {
+            $('#classes').append(
+                "<li class = 'erClass' onclick='cxcommand(erClasses["+ i + "].key)'><a href='#' target='_self'>" +
+                erClasses[i].name +
+                "</a></li>");
+        }
+
+    }
+}
+
 
 // Functions for highlighting, called by updateHighlights.
 // x in each case is the selected object or the object being treated as such.
@@ -731,12 +734,14 @@ function getInfo(model, obj) {
   }
   return text;
 }
+
 // Show the diagram's model in JSON format that the user may edit
 function saveNav() {
   saveNavDiagramProperties();  // do this first, before writing to JSON
   document.getElementById("mySavedNavModel").value = navDiagram.model.toJson();
   navDiagram.isModified = false;
 }
+
 function loadNav() {
   navDiagram.model = go.Model.fromJson(document.getElementById("mySavedNavModel").value);
   loadNavDiagramProperties();  // do this after the Model.modelData has been brought into memory
@@ -745,6 +750,7 @@ function loadNav() {
 function saveNavDiagramProperties() {
   navDiagram.model.modelData.position = go.Point.stringify(navDiagram.position);
 }
+
 function loadNavDiagramProperties(e) {
   // set Diagram.initialPosition, not Diagram.position, to handle initialization side-effects
   var pos = navDiagram.model.modelData.position;
@@ -756,7 +762,9 @@ function saveER() {
   document.getElementById("mySavedERModel").value = erDiagram.model.toJson();
   erDiagram.isModified = false;
   erClasses = $.extend(true, [], erDiagram.model.nodeDataArray); //using JQuery's extend function to copy array value and not the reference
+  resetUl();
 }
+
 function loadER() {
   erDiagram.model = go.Model.fromJson(document.getElementById("mySavedERModel").value);
   loadERDiagramProperties();  // do this after the Model.modelData has been brought into memory
@@ -765,6 +773,7 @@ function loadER() {
 function saveERDiagramProperties() {
   erDiagram.model.modelData.position = go.Point.stringify(erDiagram.position);
 }
+
 function loadERDiagramProperties(e) {
   // set Diagram.initialPosition, not Diagram.position, to handle initialization side-effects
   var pos = erDiagram.model.modelData.position;

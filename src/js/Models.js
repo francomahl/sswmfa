@@ -71,6 +71,13 @@ function init() {
       }
   });
 
+  var nodeSelectionAdornmentTemplate = //Adornment for node selection: deepsky blue stroke
+    GO(go.Adornment, "Auto",
+      GO(go.Shape, { fill: null, stroke: "deepskyblue", strokeWidth: 1.5, strokeDashArray: [4, 2] }),
+      GO(go.Placeholder)
+    );
+
+
   //******** Nav Diagram Logic ********
 
   //-------------------- Context Menu
@@ -99,18 +106,12 @@ function init() {
 
     navDiagram.groupTemplateMap.add("OfGroups",
       GO(go.Group, "Auto",
-        { resizable: true,
-          background: "transparent",
+        { background: "transparent",
           computesBoundsAfterDrag: true,
           // when the selection is dropped into a Group, add the selected Parts into that Group;
           // if it fails, cancel the tool, rolling back any changes
           mouseDrop: finishDrop,
-          handlesDragDropForMembers: true,  // don't need to define handlers on member Nodes and Links
-          // Groups containing Groups lay out their members horizontally
-          layout:
-            GO(go.GridLayout,
-              { wrappingWidth: Infinity, alignment: go.GridLayout.Position,
-                  cellSize: new go.Size(50, 50), spacing: new go.Size(1, 1) })
+          handlesDragDropForMembers: true  // don't need to define handlers on member Nodes and Links
         },
         //new go.Binding("background", "isHighlighted", function(h) { return h ? "rgba(255,0,0,0.2)" : "transparent"; }).ofObject(),
         GO(go.Shape, "Rectangle",
@@ -138,19 +139,13 @@ function init() {
 
     navDiagram.groupTemplateMap.add("OfNodes",
       GO(go.Group, "Auto",
-        { resizable: true,
-          background: "transparent",
+        { background: "transparent",
           ungroupable: true,
           computesBoundsAfterDrag: true,
           // when the selection is dropped into a Group, add the selected Parts into that Group;
           // if it fails, cancel the tool, rolling back any changes
           mouseDrop: finishDrop,
-          handlesDragDropForMembers: true,  // don't need to define handlers on member Nodes and Links
-          // Groups containing Nodes lay out their members vertically
-          layout:
-            GO(go.GridLayout,
-              { wrappingColumn: 1, alignment: go.GridLayout.Position,
-                  cellSize: new go.Size(50, 50), spacing: new go.Size(1, 1) })
+          handlesDragDropForMembers: true  // don't need to define handlers on member Nodes and Links
         },
         GO(go.Shape, "Rectangle",
           { fill: "#EAE6E6", stroke: "#EAE6E6", strokeWidth: 2 }),
@@ -180,9 +175,23 @@ function init() {
         )  // end Vertical Panel
       ));  // end Group and call to add to template Map
 
+  var fieldTemplate =
+    GO(go.Panel, "Horizontal",
+      GO(go.TextBlock,
+        { isMultiline: false, editable: false },
+        new go.Binding("text", "name").makeTwoWay()),
+      // property display
+      GO(go.TextBlock, ":",
+        {editable: false}),
+      GO(go.TextBlock,
+        { isMultiline: false, editable: true },
+        new go.Binding("text", "display").makeTwoWay()
+      )
+    );
+
   // define the node template
-  navDiagram.nodeTemplate =
-    GO(go.Node, "Spot",
+    navDiagram.nodeTemplateMap.add("Form",
+    GO(go.Node, "Auto",
       {
         contextMenu: myContextMenu,
         locationSpot: go.Spot.Center,
@@ -191,47 +200,42 @@ function init() {
         // dropping on a Node is the same as dropping on its containing Group, even if it's top-level
         mouseDrop: function(e, nod) { finishDrop(e, nod.containingGroup); }
       },
+      GO(go.Shape,
+          {
+            portId: "", // the default port: if no spot on link data, use closest side
+            fromLinkable: true, toLinkable: true, cursor: "pointer",
+            fill: "white",  // default color
+            strokeWidth: 2
+          }),
       new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
-      {   locationSpot: go.Spot.Center,
-          toEndSegmentLength: 30, fromEndSegmentLength: 30
-      },
-      GO(go.Panel, "Auto",
-          { width: 100, height: 120 },
-          GO(go.Shape,
-            {
-              name: "OBJSHAPE",
-              fill: "white",
-              portId: "", // the default port: if no spot on link data, use closest side
-              fromLinkable: true, toLinkable: true, cursor: "pointer",
-              strokeWidth: 4,
-              stroke: "gray"
-            },
-            new go.Binding("fill", "color").makeTwoWay(),
-            new go.Binding("figure", "fig").makeTwoWay()),
-          GO(go.Panel, "Table",
-            GO(go.TextBlock,
-              {
-                row: 0,
-                margin: 3,
-                stroke: "white",
-                font: "bold 11pt sans-serif",
-                isMultiline: false,
-                editable: true
-              },
-              new go.Binding("text", "key").makeTwoWay()),
-            GO(go.Picture,
-              { row: 1, width: 55, height: 55 },
-              new go.Binding("source", "icon").makeTwoWay()),
-            GO(go.TextBlock,
-              {
-                row: 2,
-                margin: 3,
-                editable: true,
-                stroke: "white",
-                font: "bold 9pt sans-serif"
-              },
-              new go.Binding("text", "name").makeTwoWay())
-          )
+      { selectionAdornmentTemplate: nodeSelectionAdornmentTemplate},
+      GO(go.Panel, "Table",
+        { defaultRowSeparatorStroke: "black"},
+        // header
+        GO(go.TextBlock,
+          {
+            row: 0, columnSpan: 2, margin: 3, alignment: go.Spot.Center,
+            font: "bold 12pt sans-serif",
+            isMultiline: false, editable: false
+          },
+          new go.Binding("text", "name").makeTwoWay()),
+        // fields
+        GO(go.Panel, "Horizontal",
+          {
+            row: 1, margin: 3,
+            defaultAlignment: go.Spot.Center
+          },
+          GO(go.TextBlock, "fields",  // the Button content
+              { font: "bold 8pt sans-serif" })
+        ),
+        GO(go.Panel, "Vertical",
+         new go.Binding("itemArray", "fields"),
+          {
+            row: 2, margin: 3, stretch: go.GraphObject.Fill,
+            defaultAlignment: go.Spot.Left,
+            itemTemplate: fieldTemplate
+          }
+        )
       ),
       {
         toolTip:  //  define a tooltip for each node that displays its information
@@ -241,7 +245,7 @@ function init() {
               new go.Binding("text",  "" , getInfo))
           )
       }
-    );
+    ));
 
   // On selection changed, make sure infoDraggable will resize as necessary
   navDiagram.addDiagramListener("ChangedSelection", function(diagramEvent) {
@@ -287,32 +291,37 @@ function init() {
     );
 
     // initialize the Palette that is on the left side of the page
-    navPalette =
-      GO(go.Palette, "navPaletteDiv",  // must name or refer to the DIV HTML element
-        {
-          maxSelectionCount: 1,
-          nodeTemplateMap: navDiagram.nodeTemplateMap,  // share the templates used by navDiagram
-          groupTemplateMap: navDiagram.groupTemplateMap,
-          layout: GO(go.GridLayout, { wrappingColumn: 1, alignment: go.GridLayout.Position }),
-          model: new go.GraphLinksModel([  // specify the contents of the Palette
-            { key: "Action", fig: "Hexagon", color:"blue" },
-            { key: "Form", name: "Form1" , fig: "RoundRectangle", color: "orange" },
-            { key: "New Group of nodes", isGroup: true, category:"OfNodes" },
-            { key: "New Group of groups", isGroup: true, category:"OfGroups" }
-          ])
-        });
-    $(function() {
-        $("#infoDraggable").draggable({ handle: "#infoDraggableHandle" });
+  navPalette =
+    GO(go.Palette, "navPaletteDiv",  // must name or refer to the DIV HTML element
+      {
+        maxSelectionCount: 1,
+        nodeTemplateMap: navDiagram.nodeTemplateMap,  // share the templates used by navDiagram
+        groupTemplateMap: navDiagram.groupTemplateMap,
+        layout: GO(go.GridLayout, { wrappingColumn: 1, alignment: go.GridLayout.Position }),
+        model: new go.GraphLinksModel([  // specify the contents of the Palette
+          { category: "Form", name: "Form", fields: [{ name: "field1", display: "yes" }]},
+          { key: "New Group of nodes", isGroup: true, category:"OfNodes" },
+          { key: "New Group of groups", isGroup: true, category:"OfGroups" }
+        ])
+      });
+  $(function() {
+      $("#infoDraggable").draggable({ handle: "#infoDraggableHandle" });
 
-        var inspector = new Inspector('myInfo', navDiagram,
-          {
-            includesOwnProperties: false,
-            properties: {
-              // key would be automatically added for nodes, but we want to declare it read-only also:
-              "key": { readOnly: true, show: Inspector.showIfPresent }
-            }
-          });
+      var inspector = new Inspector('myInfo', navDiagram,
+        {
+          includesOwnProperties: false,
+          properties: {
+            // key would be automatically added for nodes, but we want to declare it read-only also:
+            "key": { readOnly: true, show: Inspector.showIfPresent }
+          }
         });
+      });
+
+  navDiagram.model = GO(go.GraphLinksModel,
+    {
+      copiesArrays: true,
+      copiesArrayObjects: true
+    });
 
   //-------------------- Context Menu
   navDiagram.contextMenu = myContextMenu;
@@ -338,12 +347,6 @@ function init() {
   //-------------------- /Context Menu
 
   //******** ER Diagram Logic ********
-
-    var nodeSelectionAdornmentTemplate = //Adornment for node selection: deepsky blue stroke
-      GO(go.Adornment, "Auto",
-        GO(go.Shape, { fill: null, stroke: "deepskyblue", strokeWidth: 1.5, strokeDashArray: [4, 2] }),
-        GO(go.Placeholder)
-      );
 
     var propertyTemplate =
       GO(go.Panel, "Horizontal",
@@ -554,44 +557,54 @@ var erClasses = [];
 function cxcommand(classKey, val) {
   if (val === undefined) val = event.currentTarget.id;
   var diagram = navDiagram;
-  console.log(classKey);
-  console.log(val);
+
+  for (i = 0; i < erClasses.length; i++) {
+    if(erClasses[i].key == classKey) {
+      loadClassForm(diagram, erClasses[i]);
+      break;
+    }
+  }
+
   diagram.currentTool.stopTool();
 }
 
 // A custom command, for changing the color of the selected node(s).
-function changeColor(diagram, color) {
+function loadClassForm(diagram, erClass) {
   // Always make changes in a transaction, except when initializing the diagram.
-  diagram.startTransaction("change color");
+  diagram.startTransaction("add fields");
   diagram.selection.each(function(node) {
     if (node instanceof go.Node) {  // ignore any selected Links and simple Parts
         // Examine and modify the data, not the Node directly.
         var data = node.data;
-        // Call setDataProperty to support undo/redo as well as
-        // automatically evaluating any relevant bindings.
-        diagram.model.setDataProperty(data, "color", color);
+        var fields = data.fields;
+        //Clear fields
+        var flen = fields.length;
+        for (i=1; i <= flen; i++){ diagram.model.removeArrayItem(fields, 0); }
+        //Update form name
+        diagram.model.setDataProperty(data, "name", "Form " + erClass.name);
+        //Load fields from class' properties
+        for (i=0; i < erClass.properties.length; i++){
+          diagram.model.addArrayItem(fields, {name: erClass.properties[i].name , display: "yes"})}
     }
   });
-  diagram.commitTransaction("change color");
+  diagram.commitTransaction("add fields");
+}
+
+function updateContextMenu(){
+  var len = erClasses.length;
+  $('#classes').empty();
+  $('#classes').append("<li id='notFound'> No classes found </li>");
+
+  if(len > 0){
+    for (i = 0; i < len; i++) {
+      $('#classes').append(
+        "<li class = 'erClass' onclick='cxcommand(erClasses["+ i + "].key)'><a href='#' target='_self'>" +
+        erClasses[i].name +
+        "</a></li>");
+    }
+  }
 }
 //---------------------------- /Context Menu functions
-
-function resetUl(){
-    var len = erClasses.length;
-    $('#classes').empty();
-    $('#classes').append("<li id='notFound'> No classes found </li>");
-
-    if(len > 0){
-        for (i = 0; i < len; i++) {
-            $('#classes').append(
-                "<li class = 'erClass' onclick='cxcommand(erClasses["+ i + "].key)'><a href='#' target='_self'>" +
-                erClasses[i].name +
-                "</a></li>");
-        }
-
-    }
-}
-
 
 // Functions for highlighting, called by updateHighlights.
 // x in each case is the selected object or the object being treated as such.
@@ -608,7 +621,7 @@ function nodesTo(x, i) {
   } else {
     x.findNodesInto().each(function(node) {
       node.highlight = i;
-      nodesToList.add(node.data.key);
+      nodesToList.add(node.data.name);
     });
   }
   return nodesToList;
@@ -623,7 +636,7 @@ function nodesFrom(x, i) {
   } else {
     x.findNodesOutOf().each(function(node) {
       node.highlight = i;
-      nodesFromList.add(node.data.key);
+      nodesFromList.add(node.data.name);
     });
   }
   return nodesFromList;
@@ -649,7 +662,7 @@ function childNodes(x, i) {
     navDiagram.nodes.each(function(node) {
       if (node.containingGroup === x) {
         node.highlight = i;
-        childLst.add(node.data.key);
+        childLst.add(node.data.name);
       }
     });
   }
@@ -674,14 +687,14 @@ function getInfo(model, obj) {
   var text = ""; // what will be displayed
   if (x instanceof go.Node) {
     if (x instanceof go.Group) text += "Group: "; else text += "Node: ";
-    text += x.data.key;
+    text += x.data.name;
     var toLst = nodesTo(x, 0); // display names of nodes going into this node
     if (toLst.count > 0) {
       toLst.sort(function(a, b) {return a<b ? -1 : 1});
       text += "\nNodes into: ";
-      toLst.each(function(key) {
-        if (key !== text.substring(text.length-3, text.length-2)) {
-          text+= key + ", ";
+      toLst.each(function(name) {
+        if (name !== text.substring(text.length-3, text.length-2)) {
+          text+= name + ", ";
         }
       });
       text = text.substring(0, text.length-2);
@@ -690,23 +703,23 @@ function getInfo(model, obj) {
     if (frLst.count > 0) {
       frLst.sort(function(a, b) {return a<b ? -1 : 1});
       text += "\nNodes out of: ";
-      frLst.each(function(key) {
-        if (key !== text.substring(text.length-3, text.length-2)) {
-          text+= key + ", ";
+      frLst.each(function(name) {
+        if (name !== text.substring(text.length-3, text.length-2)) {
+          text+= name + ", ";
         }
       });
       text = text.substring(0, text.length-2);
     }
     var grpC = containing(x, 0); // if the node is in a group, display its name
-    if (grpC !== null) text += "\nContaining SubGraph: " + grpC.data.key;
+    if (grpC !== null) text += "\nContaining SubGraph: " + grpC.data.name;
     if (x instanceof go.Group) {
         // if it"s a group, also display nodes and links contained in it
       text += "\nMember nodes: ";
       var children = childNodes(x, 0);
       children.sort(function(a, b) {return a<b ? -1 : 1});
-      children.each(function(key) {
-        if (key !== text.substring(text.length-3, text.length-2)) {
-          text += key + ", ";
+      children.each(function(name) {
+        if (name !== text.substring(text.length-3, text.length-2)) {
+          text += name + ", ";
         }
       });
       text = text.substring(0, text.length-2);
@@ -730,7 +743,7 @@ function getInfo(model, obj) {
     text += "Link: " + x.data.from + " --> " + x.data.to +
       "\nNode To: " + x.data.to + "\nNode From: " + x.data.from;
     var grp = containing(x, 0); // and containing group, if it has one
-    if (grp !== null) text += "\nContaining SubGraph: " + grp.data.key;
+    if (grp !== null) text += "\nContaining SubGraph: " + grp.data.name;
   }
   return text;
 }
@@ -762,7 +775,7 @@ function saveER() {
   document.getElementById("mySavedERModel").value = erDiagram.model.toJson();
   erDiagram.isModified = false;
   erClasses = $.extend(true, [], erDiagram.model.nodeDataArray); //using JQuery's extend function to copy array value and not the reference
-  resetUl();
+  updateContextMenu();
 }
 
 function loadER() {

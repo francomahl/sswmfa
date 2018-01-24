@@ -17,7 +17,7 @@ function init() {
         allowDrop: true,  // must be true to accept drops from the Palette
         // what to do when a drag-drop occurs in the Diagram's background
         mouseDrop: function(e) { finishDrop(e, null); },
-        "commandHandler.archetypeGroupData": { isGroup: true, category: "OfNodes" },
+        "commandHandler.archetypeGroupData": { isGroup: true, category: "Page" },
         "draggingTool.dragsLink": true,
         "draggingTool.isGridSnapEnabled": true,
         "linkingTool.portGravity": 20,
@@ -92,7 +92,7 @@ function init() {
   });
   //-------------------- /Context Menu
 
-    // There are two templates for Groups, "OfGroups" and "OfNodes".
+    // There are two templates for Groups, "OfGroups" and "Page".
 
     // Upon a drop onto a Group, we try to add the selection as members of the Group.
     // Upon a drop onto the background, or onto a top-level Node, make selection top-level.
@@ -137,7 +137,7 @@ function init() {
         )  // end Vertical Panel
       ));  // end Group and call to add to template Map
 
-    navDiagram.groupTemplateMap.add("OfNodes",
+    navDiagram.groupTemplateMap.add("Page",
       GO(go.Group, "Auto",
         { background: "transparent",
           ungroupable: true,
@@ -177,15 +177,14 @@ function init() {
 
   var fieldTemplate =
     GO(go.Panel, "Horizontal",
-      GO(go.TextBlock,
-        { isMultiline: false, editable: false },
-        new go.Binding("text", "name").makeTwoWay()),
-      // property display
-      GO(go.TextBlock, ":",
-        {editable: false}),
-      GO(go.TextBlock,
-        { isMultiline: false, editable: true },
-        new go.Binding("text", "display").makeTwoWay()
+      GO(go.Panel, "Table",
+        GO(go.TextBlock,
+          { column: 0, isMultiline: false, editable: false, font: "bold 10pt sans-serif" },
+          new go.Binding("text", "name").makeTwoWay()),
+        // property display
+        GO("CheckBox", "display",
+          { column: 1, defaultAlignment: go.Spot.Right, "ButtonIcon.stroke": "green" },
+        )
       )
     );
 
@@ -225,7 +224,7 @@ function init() {
             row: 1, margin: 3,
             defaultAlignment: go.Spot.Center
           },
-          GO(go.TextBlock, "fields",  // the Button content
+          GO(go.TextBlock, "field display(y/n)",  // the Button content
               { font: "bold 8pt sans-serif" })
         ),
         GO(go.Panel, "Vertical",
@@ -299,8 +298,8 @@ function init() {
         groupTemplateMap: navDiagram.groupTemplateMap,
         layout: GO(go.GridLayout, { wrappingColumn: 1, alignment: go.GridLayout.Position }),
         model: new go.GraphLinksModel([  // specify the contents of the Palette
-          { category: "Form", name: "Form", fields: [{ name: "field1", display: "yes" }]},
-          { key: "New Group of nodes", isGroup: true, category:"OfNodes" },
+          { category: "Form", name: "Form", fields: [{ name: "field1", display: true }]},
+          { key: "Page", isGroup: true, category:"Page" },
           { key: "New Group of groups", isGroup: true, category:"OfGroups" }
         ])
       });

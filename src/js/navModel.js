@@ -256,6 +256,7 @@ function initNav() {
         routing: go.Link.AvoidsNodes,
         toShortLength: 2
       },
+      new go.Binding("points").makeTwoWay(),  
       GO(go.Shape,  //  the link shape
         { name: "OBJSHAPE" }),
       GO(go.Shape,  //  the arrowhead

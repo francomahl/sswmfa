@@ -149,9 +149,8 @@ function initNav() {
       )
     );
 
-  // Node Form
-  navDiagram.nodeTemplateMap.add("Form",
-  GO(go.Node, "Auto",
+  function commonNodeStyle() {
+    return [
     {
       contextMenu: myContextMenu,
       locationSpot: go.Spot.Center,
@@ -168,26 +167,31 @@ function initNav() {
           strokeWidth: 2
         }),
     new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
-    { selectionAdornmentTemplate: nodeSelectionAdornmentTemplate },
-    GO(go.Panel, "Table",
+    { selectionAdornmentTemplate: nodeSelectionAdornmentTemplate },];
+  }
+
+  function commonNodePanels() {
+    return[
       { defaultRowSeparatorStroke: "black"},
       // header
       GO(go.TextBlock,
         {
           row: 0, columnSpan: 2, margin: 3, alignment: go.Spot.Center,
           font: "bold 12pt sans-serif",
-          isMultiline: false, editable: false
+          isMultiline: false, editable: true
         },
-        new go.Binding("text", "name").makeTwoWay(),
-        new go.Binding("text", "key").makeTwoWay()),
+        new go.Binding("text", "key").makeTwoWay(),
+        new go.Binding("text", "name").makeTwoWay()),
       // fields
       GO(go.Panel, "Horizontal",
         {
           row: 1, margin: 3,
           defaultAlignment: go.Spot.Center
         },
-        GO(go.TextBlock, "field display(y/n)",  // the Button content
-            { font: "bold 8pt sans-serif" })
+        GO(go.TextBlock,  // Shows the class is related to
+            { font: "bold 8pt sans-serif",
+              editable: false},
+            new go.Binding("text","class").makeTwoWay())
       ),
       GO(go.Panel, "Vertical",
        new go.Binding("itemArray", "fields"),
@@ -197,86 +201,35 @@ function initNav() {
           itemTemplate: fieldTemplate
         }
       ),
+    ]
+  }
+
+  // Node Form
+  navDiagram.nodeTemplateMap.add("Form",
+  GO(go.Node, "Auto",commonNodeStyle(),
+    GO(go.Panel, "Table",
+      commonNodePanels(),
       GO(go.TextBlock,
         { isMultiline: true, visible: false },
         new go.Binding("text","comments").makeTwoWay()
       )
-    ),
-    {
-      toolTip:  //  define a tooltip for each node that displays its information
-        GO(go.Adornment, "Auto",
-          GO(go.Shape, { fill: "#EFEFCC" }),
-          GO(go.TextBlock, { margin: 4 },
-            new go.Binding("text",  "" , getInfo))
-        )
-    }
+    )
   ));
 
   // Node List
   navDiagram.nodeTemplateMap.add("List",
-  GO(go.Node, "Auto",
-    {
-      contextMenu: myContextMenu,
-      locationSpot: go.Spot.Center,
-      fromSpot: go.Spot.AllSides,
-      toSpot: go.Spot.AllSides,
-      // dropping on a Node is the same as dropping on its containing Group, even if it's top-level
-      mouseDrop: function(e, nod) { finishDrop(e, nod.containingGroup); }
-    },
-    GO(go.Shape,
-        {
-          portId: "", // the default port: if no spot on link data, use closest side
-          fromLinkable: true, toLinkable: true, cursor: "pointer",
-          fill: "white",  // default color
-          strokeWidth: 2
-        }),
-    new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
-    { selectionAdornmentTemplate: nodeSelectionAdornmentTemplate },
+  GO(go.Node, "Auto", commonNodeStyle(),
     GO(go.Panel, "Table",
-      { defaultRowSeparatorStroke: "black"},
-      // header
-      GO(go.TextBlock,
-        {
-          row: 0, columnSpan: 2, margin: 3, alignment: go.Spot.Center,
-          font: "bold 12pt sans-serif",
-          isMultiline: false, editable: false
-        },
-        new go.Binding("text", "name").makeTwoWay(),
-        new go.Binding("text", "key").makeTwoWay()),
-      // fields
-      GO(go.Panel, "Horizontal",
-        {
-          row: 1, margin: 3,
-          defaultAlignment: go.Spot.Center
-        },
-        GO(go.TextBlock, "field display(y/n)",  // the Button content
-            { font: "bold 8pt sans-serif" })
-      ),
-      GO(go.Panel, "Vertical",
-       new go.Binding("itemArray", "fields"),
-        {
-          row: 2, margin: 3, stretch: go.GraphObject.Fill,
-          defaultAlignment: go.Spot.Left,
-          itemTemplate: fieldTemplate
-        }
-      ),
-      GO(go.TextBlock,
-        { isMultiline: true, visible: false },
-        new go.Binding("text","Type").makeTwoWay()
-      ),
+      commonNodePanels(),
       GO(go.TextBlock,
         { visible: false },
         new go.Binding("text","comments").makeTwoWay()
+      ),
+      GO(go.TextBlock,
+        { isMultiline: true, visible: false },
+        new go.Binding("text","type").makeTwoWay()
       )
-    ),
-    {
-      toolTip:  //  define a tooltip for each node that displays its information
-        GO(go.Adornment, "Auto",
-          GO(go.Shape, { fill: "#EFEFCC" }),
-          GO(go.TextBlock, { margin: 4 },
-            new go.Binding("text",  "" , getInfo))
-        )
-    }
+    )
   ));
 
   // On selection changed, make sure infoDraggable will resize as necessary
@@ -311,7 +264,8 @@ function initNav() {
         { segmentOffset: new go.Point(0, -10),
           segmentOrientation: go.Link.OrientUpright,
           editable: true
-        }),
+        },
+        new go.Binding("text","details").makeTwoWay()),
       {
         toolTip:  //  define a tooltip for each link that displays its information
           GO(go.Adornment, "Auto",
@@ -331,24 +285,31 @@ function initNav() {
         groupTemplateMap: navDiagram.groupTemplateMap,
         layout: GO(go.GridLayout, { wrappingColumn: 1, alignment: go.GridLayout.Position }),
         model: new go.GraphLinksModel([  // specify the contents of the Palette
-          { category: "Form", key: "Form", fields: [{ name: "field1", display: true }], comments: ""},
-          { category: "List", key: "List", fields: [{ name: "field1", display: true }], type:"Simple List", comments: ""},
+          { category: "Form", key: "Form", class: "No Class selected", fields: [{ name: "field1", display: true }], comments: ""},
+          { category: "List", key: "Simple List", class: "No Class selected", fields: [{ name: "field1", display: true }], type:"Simple List", comments: ""},
+          { category: "List", key: "List", class: "No Class selected", fields: [{ name: "field1", display: true }], type:"List", comments: ""},
+          { category: "List", key: "Checkeable List", class: "No Class selected", fields: [{ name: "field1", display: true }], type:"Checkeable List", comments: ""},
           { key: "Page", isGroup: true, category:"Page" },
           { key: "New Group of groups", isGroup: true, category:"OfGroups" }
         ])
       });
+
+  //Updates information into div infoDraggable when a Node is selected
   $(function() {
       $("#infoDraggable").draggable({ handle: "#infoDraggableHandle" });
-
       var inspector = new Inspector('myInfo', navDiagram,
         {
           includesOwnProperties: false,
           properties: {
-            // key would be automatically added for nodes, but we want to declare it read-only also:
+            // Nodes properties
             "key": { readOnly: true, show: Inspector.showIfPresent },
             "category": { readOnly: true, show: Inspector.showIfPresent },
-            "type": { show: Inspector.showIfPresent },
-            "comments": { show: Inspector.showIfPresent }
+            "type": { readOnly: true, show: Inspector.showIfPresent },
+            "comments": { show: Inspector.showIfPresent },
+            // Links properties
+            "from": { readOnly: true, show: Inspector.showIfPresent },
+            "to": { readOnly: true, show: Inspector.showIfPresent },
+            "details": { show: Inspector.showIfPresent }
           }
         });
       });

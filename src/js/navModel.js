@@ -42,7 +42,7 @@ function initNav() {
       GO(go.Placeholder)
     );
 
-  //-------------------- Context Menu
+  //-------------------- Context Menu (right click on a node)
   // This is the actual HTML context menu:
   var cxElement = document.getElementById("contextMenu");
 
@@ -54,7 +54,7 @@ function initNav() {
   });
   //-------------------- /Context Menu
 
-    // There are two templates for Groups, "OfGroups" and "Page".
+    // There are two templates for Groups, "Group" and "Page".
 
     // Upon a drop onto a Group, we try to add the selection as members of the Group.
     // Upon a drop onto the background, or onto a top-level Node, make selection top-level.
@@ -65,8 +65,8 @@ function initNav() {
           : e.diagram.commandHandler.addTopLevelParts(e.diagram.selection, true));
     if (!ok) e.diagram.currentTool.doCancel();
   }
-
-  navDiagram.groupTemplateMap.add("OfGroups",
+  //Group of pages
+  navDiagram.groupTemplateMap.add("Group",
     GO(go.Group, "Auto",
       { background: "transparent",
         computesBoundsAfterDrag: true,
@@ -98,6 +98,7 @@ function initNav() {
       )  // end Vertical Panel
     ));  // end Group and call to add to template Map
 
+  //Group of nodes - Page
   navDiagram.groupTemplateMap.add("Page",
     GO(go.Group, "Auto",
       { background: "transparent",
@@ -256,7 +257,7 @@ function initNav() {
         routing: go.Link.AvoidsNodes,
         toShortLength: 2
       },
-      new go.Binding("points").makeTwoWay(),  
+      new go.Binding("points").makeTwoWay(),
       GO(go.Shape,  //  the link shape
         { name: "OBJSHAPE" }),
       GO(go.Shape,  //  the arrowhead
@@ -284,7 +285,7 @@ function initNav() {
           { category: "List", key: "List", class: "No Class selected", fields: [{ name: "field1", display: true }], type:"List", comments: ""},
           { category: "List", key: "Checkeable List", class: "No Class selected", fields: [{ name: "field1", display: true }], type:"Checkeable List", comments: ""},
           { key: "Page", isGroup: true, category:"Page" },
-          { key: "New Group of groups", isGroup: true, category:"OfGroups" }
+          { key: "Group of pages", isGroup: true, category:"Group" }
         ])
       });
 

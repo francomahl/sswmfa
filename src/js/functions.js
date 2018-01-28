@@ -30,7 +30,7 @@ function loadClassForm(diagram, erClass) {
         var flen = fields.length;
         for (i=1; i <= flen; i++){ diagram.model.removeArrayItem(fields, 0); }
         //Update form name
-        diagram.model.setDataProperty(data, "name", "Form " + erClass.name);
+        diagram.model.setDataProperty(data, "name", erClass.name + " " + data.category );
         //Load fields from class' properties
         for (i=0; i < erClass.properties.length; i++){
           diagram.model.addArrayItem(fields, {name: erClass.properties[i].name , display: "yes"})}

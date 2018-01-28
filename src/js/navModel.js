@@ -196,6 +196,77 @@ function initNav() {
           defaultAlignment: go.Spot.Left,
           itemTemplate: fieldTemplate
         }
+      ),
+      GO(go.TextBlock,
+        { isMultiline: true, visible: false },
+        new go.Binding("text","comments").makeTwoWay()
+      )
+    ),
+    {
+      toolTip:  //  define a tooltip for each node that displays its information
+        GO(go.Adornment, "Auto",
+          GO(go.Shape, { fill: "#EFEFCC" }),
+          GO(go.TextBlock, { margin: 4 },
+            new go.Binding("text",  "" , getInfo))
+        )
+    }
+  ));
+
+  // Node List
+  navDiagram.nodeTemplateMap.add("List",
+  GO(go.Node, "Auto",
+    {
+      contextMenu: myContextMenu,
+      locationSpot: go.Spot.Center,
+      fromSpot: go.Spot.AllSides,
+      toSpot: go.Spot.AllSides,
+      // dropping on a Node is the same as dropping on its containing Group, even if it's top-level
+      mouseDrop: function(e, nod) { finishDrop(e, nod.containingGroup); }
+    },
+    GO(go.Shape,
+        {
+          portId: "", // the default port: if no spot on link data, use closest side
+          fromLinkable: true, toLinkable: true, cursor: "pointer",
+          fill: "white",  // default color
+          strokeWidth: 2
+        }),
+    new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+    { selectionAdornmentTemplate: nodeSelectionAdornmentTemplate },
+    GO(go.Panel, "Table",
+      { defaultRowSeparatorStroke: "black"},
+      // header
+      GO(go.TextBlock,
+        {
+          row: 0, columnSpan: 2, margin: 3, alignment: go.Spot.Center,
+          font: "bold 12pt sans-serif",
+          isMultiline: false, editable: false
+        },
+        new go.Binding("text", "name").makeTwoWay(),
+        new go.Binding("text", "key").makeTwoWay()),
+      // fields
+      GO(go.Panel, "Horizontal",
+        {
+          row: 1, margin: 3,
+          defaultAlignment: go.Spot.Center
+        },
+        GO(go.TextBlock, "field display(y/n)",  // the Button content
+            { font: "bold 8pt sans-serif" })
+      ),
+      GO(go.Panel, "Vertical",
+       new go.Binding("itemArray", "fields"),
+        {
+          row: 2, margin: 3, stretch: go.GraphObject.Fill,
+          defaultAlignment: go.Spot.Left,
+          itemTemplate: fieldTemplate
+        }
+      ),
+      GO(go.TextBlock,
+        { isMultiline: true, visible: false },
+        new go.Binding("text","Type").makeTwoWay()
+      ),
+      GO(go.TextBlock,
+        { visible: false },
+        new go.Binding("text","comments").makeTwoWay()
       )
     ),
     {
@@ -260,7 +331,8 @@ function initNav() {
         groupTemplateMap: navDiagram.groupTemplateMap,
         layout: GO(go.GridLayout, { wrappingColumn: 1, alignment: go.GridLayout.Position }),
         model: new go.GraphLinksModel([  // specify the contents of the Palette
-          { category: "Form", key: "Form", fields: [{ name: "field1", display: true }]},
+          { category: "Form", key: "Form", fields: [{ name: "field1", display: true }], comments: ""},
+          { category: "List", key: "List", fields: [{ name: "field1", display: true }], type:"Simple List", comments: ""},
           { key: "Page", isGroup: true, category:"Page" },
           { key: "New Group of groups", isGroup: true, category:"OfGroups" }
         ])
@@ -274,7 +346,9 @@ function initNav() {
           properties: {
             // key would be automatically added for nodes, but we want to declare it read-only also:
             "key": { readOnly: true, show: Inspector.showIfPresent },
-            "category": { readOnly: true, show: Inspector.showIfPresent }
+            "category": { readOnly: true, show: Inspector.showIfPresent },
+            "type": { show: Inspector.showIfPresent },
+            "comments": { show: Inspector.showIfPresent }
           }
         });
       });

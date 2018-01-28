@@ -265,15 +265,8 @@ function initNav() {
           segmentOrientation: go.Link.OrientUpright,
           editable: true
         },
-        new go.Binding("text","details").makeTwoWay()),
-      {
-        toolTip:  //  define a tooltip for each link that displays its information
-          GO(go.Adornment, "Auto",
-            GO(go.Shape, { fill: "#EFEFCC" }),
-            GO(go.TextBlock, { margin: 4 },
-              new go.Binding("text",  "" , getInfo))
-          )
-      }
+        new go.Binding("text","details").makeTwoWay()
+      )
     );
 
     // initialize the Palette that is on the left side of the page

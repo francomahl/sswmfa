@@ -111,8 +111,7 @@ function initER() {
             font: "bold 12pt sans-serif",
             isMultiline: false, editable: true
           },
-          new go.Binding("text", "name").makeTwoWay(),
-          new go.Binding("text", "key").makeTwoWay()),
+          new go.Binding("text", "name").makeTwoWay()),
         // properties
         GO(go.Panel, "Horizontal",
           {
@@ -227,7 +226,7 @@ function initER() {
               )
             ),
         model: new go.GraphLinksModel([  // specify the contents of the Palette
-          { key: "Class",
+          { name: "Class",
             properties: [{ name: "property", type: "type" }]}
         ])
       });

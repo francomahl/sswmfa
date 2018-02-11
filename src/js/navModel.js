@@ -65,50 +65,9 @@ function initNav() {
           : e.diagram.commandHandler.addTopLevelParts(e.diagram.selection, true));
     if (!ok) e.diagram.currentTool.doCancel();
   }
-  //Group of pages
-  navDiagram.groupTemplateMap.add("Group",
-    GO(go.Group, "Auto",
-      { background: "transparent",
-        computesBoundsAfterDrag: true,
-        // when the selection is dropped into a Group, add the selected Parts into that Group;
-        // if it fails, cancel the tool, rolling back any changes
-        mouseDrop: finishDrop,
-        handlesDragDropForMembers: true  // don't need to define handlers on member Nodes and Links
-      },
-      GO(go.Shape, "Rectangle",
-        { fill: "#455983", stroke: "#455983", strokeWidth: 2 }),
-      GO(go.Panel, "Vertical",  // title above Placeholder
-        GO(go.Panel, "Horizontal",  // button next to TextBlock
-          { stretch: go.GraphObject.Horizontal, background: "#455983" },
-          GO("SubGraphExpanderButton",
-            { alignment: go.Spot.Right, margin: 5 }),
-          GO(go.TextBlock,
-            {
-              alignment: go.Spot.Left,
-              editable: true,
-              margin: 5,
-              font: "bold 18px sans-serif",
-              opacity: 0.75,
-              stroke: "white"
-            },
-            new go.Binding("text", "key").makeTwoWay())
-        ),  // end Horizontal Panel
-        GO(go.Placeholder,
-          { padding: 16, alignment: go.Spot.TopLeft })
-      )  // end Vertical Panel
-    ));  // end Group and call to add to template Map
 
-  //Group of nodes - Page
-  navDiagram.groupTemplateMap.add("Page",
-    GO(go.Group, "Auto",
-      { background: "transparent",
-        ungroupable: true,
-        computesBoundsAfterDrag: true,
-        // when the selection is dropped into a Group, add the selected Parts into that Group;
-        // if it fails, cancel the tool, rolling back any changes
-        mouseDrop: finishDrop,
-        handlesDragDropForMembers: true  // don't need to define handlers on member Nodes and Links
-      },
+  function commonGroupPanels() {
+    return [
       GO(go.Shape, "Rectangle",
         { fill: "#EAE6E6", stroke: "#EAE6E6", strokeWidth: 2 }),
       GO(go.Panel, "Vertical",  // title above Placeholder
@@ -130,11 +89,42 @@ function initNav() {
               opacity: 0.75,
               stroke: "black"
             },
-            new go.Binding("text", "key").makeTwoWay())
+            new go.Binding("text", "name").makeTwoWay())
         ),  // end Horizontal Panel
         GO(go.Placeholder,
           { padding: 16, alignment: go.Spot.TopLeft })
       )  // end Vertical Panel
+    ];
+  };
+
+  //Group of nodes - Main Page - This will exist always. No copiable, no deletable
+  navDiagram.groupTemplateMap.add("MainPage",
+    GO(go.Group, "Auto",
+      { background: "transparent",
+        ungroupable: true,
+        computesBoundsAfterDrag: true,
+        copyable: false,
+        deletable: false,
+        // when the selection is dropped into a Group, add the selected Parts into that Group;
+        // if it fails, cancel the tool, rolling back any changes
+        mouseDrop: finishDrop,
+        handlesDragDropForMembers: true  // don't need to define handlers on member Nodes and Links
+      },
+      commonGroupPanels(),
+    ));  // end Group and call to add to template Map
+
+  //Group of nodes - Page
+  navDiagram.groupTemplateMap.add("Page",
+    GO(go.Group, "Auto",
+      { background: "transparent",
+        ungroupable: true,
+        computesBoundsAfterDrag: true,
+        // when the selection is dropped into a Group, add the selected Parts into that Group;
+        // if it fails, cancel the tool, rolling back any changes
+        mouseDrop: finishDrop,
+        handlesDragDropForMembers: true  // don't need to define handlers on member Nodes and Links
+      },
+      commonGroupPanels(),
     ));  // end Group and call to add to template Map
 
   var fieldTemplate =
@@ -181,7 +171,7 @@ function initNav() {
           font: "bold 12pt sans-serif",
           isMultiline: false, editable: true
         },
-        new go.Binding("text", "key").makeTwoWay(),
+//        new go.Binding("text", "key").makeTwoWay(),
         new go.Binding("text", "name").makeTwoWay()),
       // fields
       GO(go.Panel, "Horizontal",
@@ -280,12 +270,11 @@ function initNav() {
         groupTemplateMap: navDiagram.groupTemplateMap,
         layout: GO(go.GridLayout, { wrappingColumn: 1, alignment: go.GridLayout.Position }),
         model: new go.GraphLinksModel([  // specify the contents of the Palette
-          { category: "Form", key: "Form", class: "No Class selected", fields: [{ name: "field1", display: true }], comments: ""},
-          { category: "List", key: "Simple List", class: "No Class selected", fields: [{ name: "field1", display: true }], type:"Simple List", comments: ""},
-          { category: "List", key: "List", class: "No Class selected", fields: [{ name: "field1", display: true }], type:"List", comments: ""},
-          { category: "List", key: "Checkeable List", class: "No Class selected", fields: [{ name: "field1", display: true }], type:"Checkeable List", comments: ""},
-          { key: "Page", isGroup: true, category:"Page" },
-          { key: "Group of pages", isGroup: true, category:"Group" }
+          { category: "Form", name: "Form", class: "No Class selected", fields: [{ name: "field1", display: true }], comments: ""},
+          { category: "List", name: "Simple List", class: "No Class selected", fields: [{ name: "field1", display: true }], type:"Simple List", comments: ""},
+          { category: "List", name: "List", class: "No Class selected", fields: [{ name: "field1", display: true }], type:"List", comments: ""},
+          { category: "List", name: "Checkeable List", class: "No Class selected", fields: [{ name: "field1", display: true }], type:"Checkeable List", comments: ""},
+          { name: "Page", isGroup: true, category:"Page" }
         ])
       });
 
@@ -298,6 +287,7 @@ function initNav() {
           properties: {
             // Nodes properties
             "key": { readOnly: true, show: Inspector.showIfPresent },
+            "name": { readOnly: true, show: Inspector.showIfPresent },
             "category": { readOnly: true, show: Inspector.showIfPresent },
             "type": { readOnly: true, show: Inspector.showIfPresent },
             "comments": { show: Inspector.showIfPresent },
@@ -309,10 +299,15 @@ function initNav() {
         });
       });
 
+// setup a main page
+  var nodedata = [
+    { name: "Main Page", isGroup: true, category:"MainPage" }];
+
   navDiagram.model = GO(go.GraphLinksModel,
     {
       copiesArrays: true,
-      copiesArrayObjects: true
+      copiesArrayObjects: true,
+      nodeDataArray: nodedata
     });
 
   //-------------------- Context Menu

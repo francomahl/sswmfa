@@ -6,10 +6,13 @@
     <meta name="description" content="Server Side Web Modelling for Augmentations" />
     <meta charset="UTF-8">
 
+<!-- thrid party libraries -->
     <link rel="stylesheet" href="src/gojs/assets/css/jquery-ui.min.css" />
     <script src="src/gojs/assets/js/jquery.min.js"></script>
     <script src="src/gojs/assets/js/jquery-ui.min.js"></script>
     <script src="src/gojs/release/go.js"></script>
+
+    <script src="src/jquery-simple-templates/jquery.tmpl.1.1.1.js"></script>
 
     <link rel='stylesheet' href='src/gojs/extensions/DataInspector.css' />
     <script src="src/gojs/extensions/DataInspector.js"></script>
@@ -18,14 +21,13 @@
 
     <link rel="stylesheet" href="src/bootstrap-4.0.0-alpha.6-dist/css/bootstrap.min.css"/>
     <script src="src/bootstrap-4.0.0-alpha.6-dist/js/bootstrap.min.js"></script>
-
+<!-- /thrid party libraries -->
 
     <script src="src/js/erModel.js"></script>
     <script src="src/js/navModel.js"></script>
+    <script src="src/js/parsers.js"></script>
+    <script src="src/js/play.js"></script>
     <script src="src/js/functions.js"></script>
-    <script src="src/js/require.js"></script>
-
-    <script src="src/node_modules/xml-js/dist/xml-js.min.js"></script>
 
 </head>
 <body onload="initER();initNav();">
@@ -87,6 +89,7 @@
           <div>
             <div>
               <button id="SaveNavButton" onclick="saveNav()">Save</button>
+              <button id="SaveNavButton" onclick="play()">Play</button>
               <button onclick="loadNav()">Load</button>key
               Diagram Model saved in JSON format:
             </div>

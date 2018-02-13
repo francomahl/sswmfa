@@ -133,9 +133,12 @@ function initNav() {
         GO(go.TextBlock,
           { column: 0, isMultiline: false, editable: false, font: "bold 10pt sans-serif" },
           new go.Binding("text", "name").makeTwoWay()),
+        GO(go.TextBlock,
+          { column: 1, visible: false },
+          new go.Binding("text", "type").makeTwoWay()),
         // property display
         GO("CheckBox", "display",
-          { column: 1, defaultAlignment: go.Spot.Right, "ButtonIcon.stroke": "green" },
+          { column: 2, defaultAlignment: go.Spot.Right, "ButtonIcon.stroke": "green" },
         )
       )
     );
@@ -270,10 +273,10 @@ function initNav() {
         groupTemplateMap: navDiagram.groupTemplateMap,
         layout: GO(go.GridLayout, { wrappingColumn: 1, alignment: go.GridLayout.Position }),
         model: new go.GraphLinksModel([  // specify the contents of the Palette
-          { category: "Form", name: "Form", class: "No Class selected", fields: [{ name: "field1", display: true }], comments: ""},
-          { category: "List", name: "Simple List", class: "No Class selected", fields: [{ name: "field1", display: true }], type:"Simple List", comments: ""},
-          { category: "List", name: "List", class: "No Class selected", fields: [{ name: "field1", display: true }], type:"List", comments: ""},
-          { category: "List", name: "Checkeable List", class: "No Class selected", fields: [{ name: "field1", display: true }], type:"Checkeable List", comments: ""},
+          { category: "Form", name: "Form", class: "No Class selected", fields: [{ name: "field1", type: "dataType", display: true }], comments: ""},
+          { category: "List", name: "Simple List", class: "No Class selected", fields: [{ name: "field1", type: "dataType", display: true }], type:"Simple List", comments: ""},
+          { category: "List", name: "List", class: "No Class selected", fields: [{ name: "field1", type: "dataType", display: true }], type:"List", comments: ""},
+          { category: "List", name: "Checkeable List", class: "No Class selected", fields: [{ name: "field1", type: "dataType", display: true }], type:"Checkeable List", comments: ""},
           { name: "Page", isGroup: true, category:"Page" }
         ])
       });

@@ -255,7 +255,7 @@ function initNav() {
         { name: "OBJSHAPE" }),
       GO(go.Shape,  //  the arrowhead
         { name: "ARWSHAPE", toArrow: "Standard" }),
-      GO(go.TextBlock, "text",
+      GO(go.TextBlock, "link",
         { segmentOffset: new go.Point(0, -10),
           segmentOrientation: go.Link.OrientUpright,
           editable: true

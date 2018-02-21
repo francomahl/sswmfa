@@ -26,14 +26,24 @@ function parseForm(jsonForm){
         default:
             inputType = 'text';
       } // end switch
-      var inputTemplate = '<p> <label> #{name} </label> : <input type="#{inputType}"> </p>';
+      if (inputType == 'checkbox'){
+         var inputTemplate = '<div class="form-check"> <label class="form-check-label"> <input type="#{inputType}" class="form-check-input"> #{name} </label> </div>' + '\n';
+      } else {
+        var inputTemplate = '<div class="form-group"> <label> #{name} </label> <input type="#{inputType}" class="form-control"> </div>' + '\n';
+      }
       var inputValues = { name: jsonForm.fields[fd].name , inputType: inputType };
       var input = $.tmpl(inputTemplate, inputValues);
       elements = elements + input;
     }// end if display true
   }// end for
 
-  var formTemplate = '<div> <h3> #{name} </h3> <form action="#"> #{elements} </br> <input type="submit" value="Submit"> </form> </div>';
+  var formTemplate = '<div>' + '\n' +
+  ' <h3> #{name} </h3>' + '\n' +
+  ' <form action="#">' + '\n' +
+  '  #{elements} </br>' + '\n' +
+  '  <button type="submit" class="btn btn-primary">Submit</button>' + '\n' +
+  ' </form>' + '\n' +
+  '</div>';
   var formValues = { name: jsonForm.name, elements: elements };
   var formCode = $.tmpl(formTemplate, formValues);
 
@@ -46,14 +56,19 @@ function parseList(jsonList){
 
   for( var lf = 0; lf < jsonList.fields.length; lf++ ){
     if ( jsonList.fields[lf].display == true ){
-      var headerTemplate = '<th> #{name} </th>';
+      var headerTemplate = '<th> #{name} </th>' + '\n';
       var headerValues = { name: jsonList.fields[lf].name };
       var header = $.tmpl(headerTemplate, headerValues);
       headers = headers + header;
     }// end if display true
   }// end for
 
-  var listTemplate = '<div> <h3> #{name} </h3> <table> <tr> #{headers} </tr> </table> </div>';
+  var listTemplate = '<div>' + '\n' +
+  ' <h3> #{name} </h3>' + '\n' +
+  ' <table>' + '\n' +
+  '  <tr> #{headers} </tr>' + '\n' +
+  ' </table>' + '\n' +
+  '</div>';
   var listValues = { name: jsonList.name, headers: headers };
   var listCode = $.tmpl(listTemplate, listValues);
 
@@ -76,9 +91,9 @@ function parseLink(jsonLink, pages){
   };
 
   var linkToText = jsonLink.details;
-  if ( linkToText == '' ){ linkToText = linkToPage }
+  if ( linkToText == null || linkToText == '' ){ linkToText = linkToPage }
 
-  var linkTemplate = '<p> <a href="#{url}"> #{name} </a></p> ';
+  var linkTemplate = '<p> <a href="#{url}"> #{name} </a></p>' + '\n';
   var linkValues = { url: url, name: linkToText };
   var linkCode = $.tmpl(linkTemplate, linkValues);
 

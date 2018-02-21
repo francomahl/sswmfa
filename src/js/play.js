@@ -49,7 +49,22 @@ function play(){
 
     content =  pageForms + pageLists + pageLinks;
 
-    var myTemplate = '<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title> #{name} </title> </head> <body> #{content} </body> </html>';
+    var myTemplate = '<!DOCTYPE html>' + '\n' +
+    '<html lang="en">' + '\n' +
+    ' <head> <meta charset="UTF-8">' + '\n' +
+    '  <title> #{name} </title>' + '\n' +
+    '  <link rel="stylesheet" href="../css/style.css" />' + '\n' +
+    '  <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>' + '\n' +
+    '  <link rel="stylesheet" href="../bootstrap-4.0.0-alpha.6-dist/css/bootstrap.min.css"/>' + '\n' +
+    '  <script src="../bootstrap-4.0.0-alpha.6-dist/js/bootstrap.min.js"></script>' + '\n' +
+    ' </head> ' + '\n' +
+    ' <body>' + '\n' +
+    '  <div class="container-fluid">' + '\n' +
+    '   #{content}' + '\n' +
+    '   <footer> <p>&copy; SSMDWA - UNLP 2018</p> </footer>' + '\n' +
+    '  </div>' + '\n' +
+    ' </body>' + '\n' +
+    '</html>';
     var myValues = { name: pages[p].name, content: content };
     var htmlCode = $.tmpl(myTemplate, myValues);
 

@@ -29,21 +29,21 @@ function play(){
     for ( var f = 0; f < forms.length; f++ ){
       //parse forms within group
       if( forms[f].group == pages[p].key ){
-        pageForms = pageForms + parseForm(forms[f]);
+        pageForms = pageForms + parseForm(forms[f]) + '\n';
       }
     }
 
     for ( var l = 0; l < lists.length; l++ ){
       //parse lists within group
        if ( lists[l].group == pages[p].key ){
-        pageLists = pageLists + parseList(lists[l]);
+        pageLists = pageLists + parseList(lists[l]) + '\n';
       }
     };
 
     for( var k = 0; k < navLinks.length; k++ ){
       //parse forms within group
       if(navLinks[k].from == pages[p].key ){
-        pageLinks = pageLinks + parseLink(navLinks[k], pages);
+        pageLinks = pageLinks + parseLink(navLinks[k], pages) + '\n';
       }
     };
 

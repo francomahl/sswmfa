@@ -79,15 +79,19 @@ function parseList(jsonList){
 
 //Parser for Links - from JSON to HTML
 function parseLink(jsonLink, pages){
-  var linkToPage = 'not_found';
-  var url = 'http://localhost:8000/src/view/not_found.html';
+  var linkToPage = 'home';
+  var url = 'http://localhost:3000/render';
 
   for( var lp = 0; lp < pages.length; lp++ ){
     if( jsonLink.to == pages[lp].key ){
-      linkToPage = pages[lp].name;
-      linkToPage = linkToPage.replace(' ', '_');
-      linkToPage = linkToPage.toLowerCase();
-      url = 'http://localhost:8000/src/view/'+ linkToPage + '.html';
+      if(pages[lp].category == "MainPage"){
+        url = 'http://localhost:3000/render/';
+      }else{
+        linkToPage = pages[lp].name;
+        linkToPage = linkToPage.replace(' ', '_');
+        linkToPage = linkToPage.toLowerCase();
+        url = 'http://localhost:3000/render/'+ linkToPage;
+      }
       break;
     }
   };

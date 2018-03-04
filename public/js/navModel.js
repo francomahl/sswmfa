@@ -304,7 +304,7 @@ function initNav() {
 
 // setup a main page
   var nodedata = [
-    { name: "Main Page", isGroup: true, category:"MainPage" }];
+    { name: "Index", isGroup: true, category:"MainPage" }];
 
   navDiagram.model = GO(go.GraphLinksModel,
     {

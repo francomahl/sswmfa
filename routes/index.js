@@ -4,10 +4,14 @@ var router = express.Router();
 var fs = require('fs');
 
 /* GET home page. */
-router.get('/',function(req,res, next){
-  res.sendFile(path.join(__dirname,'../', '/home.html'));
+//router.get('/',function(req,res, next){
+//  res.sendFile(path.join(__dirname,'../', '/home.html'));
   //__dirname : It will resolve to your project folder.
-});
+//});
+
+router.get('/', function (req, res) {
+  res.render('sswmfa')
+})
 
 router.post('/createFile', function(req, res, next){
 	var fileContent = req.body.fileContent

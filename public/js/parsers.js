@@ -27,9 +27,14 @@ function parseForm(jsonForm){
             inputType = 'text';
       } // end switch
       if (inputType == 'checkbox'){
-         var inputTemplate = '<div class="form-check"> <label class="form-check-label"> <input type="#{inputType}" class="form-check-input"> #{name} </label> </div>' + '\n';
+         var inputTemplate = "          .form-check" + '\n' +
+                             "            label.form-check-label" + '\n' +
+                             "              input.form-check-input(type='#{inputType}')" + '\n' +
+                             "              |  #{name}" + '\n';
       } else {
-        var inputTemplate = '<div class="form-group"> <label> #{name} </label> <input type="#{inputType}" class="form-control"> </div>' + '\n';
+        var inputTemplate = "          .form-group" + '\n' +
+                            "            label  #{name}" + '\n' +
+                            "            input.form-control(type='#{inputType}')" + '\n';
       }
       var inputValues = { name: jsonForm.fields[fd].name , inputType: inputType };
       var input = $.tmpl(inputTemplate, inputValues);
@@ -37,13 +42,11 @@ function parseForm(jsonForm){
     }// end if display true
   }// end for
 
-  var formTemplate = '<div>' + '\n' +
-  ' <h3> #{name} </h3>' + '\n' +
-  ' <form action="#">' + '\n' +
-  '  #{elements} </br>' + '\n' +
-  '  <button type="submit" class="btn btn-primary">Submit</button>' + '\n' +
-  ' </form>' + '\n' +
-  '</div>';
+  var formTemplate = "        h3  #{name}" + '\n' +
+                     '        form(action="#")' + '\n' +
+                     '#{elements}' + '\n' +
+                     "          br" + '\n' +
+                     "          button.btn.btn-primary(type='submit') Submit" + '\n';
   var formValues = { name: jsonForm.name, elements: elements };
   var formCode = $.tmpl(formTemplate, formValues);
 
@@ -56,21 +59,17 @@ function parseList(jsonList){
 
   for( var lf = 0; lf < jsonList.fields.length; lf++ ){
     if ( jsonList.fields[lf].display == true ){
-      var headerTemplate = '   <th> #{name} </th>' + '\n';
+      var headerTemplate = '            th  #{name}' + '\n';
       var headerValues = { name: jsonList.fields[lf].name };
       var header = $.tmpl(headerTemplate, headerValues);
       headers = headers + header;
     }// end if display true
   }// end for
 
-  var listTemplate = '<div>' + '\n' +
-  ' <h3> #{name} </h3>' + '\n' +
-  ' <table>' + '\n' +
-  '  <tr>' + '\n' +
-  '#{headers}' + '\n' +
-  '  </tr>' + '\n' +
-  ' </table>' + '\n' +
-  '</div>';
+  var listTemplate = "        h3  #{name}" + '\n' +
+                     '        table' + '\n' +
+                     '          tr' + '\n' +
+                     '#{headers}'+ '\n';
   var listValues = { name: jsonList.name, headers: headers };
   var listCode = $.tmpl(listTemplate, listValues);
 
@@ -88,8 +87,7 @@ function parseLink(jsonLink, pages){
         url = 'http://localhost:3000/render/';
       }else{
         linkToPage = pages[lp].name;
-        linkToPage = linkToPage.replace(' ', '_');
-        linkToPage = linkToPage.toLowerCase();
+        linkToPage = linkToPage.toLowerCase().split(" ").join("_");
         url = 'http://localhost:3000/render/'+ linkToPage;
       }
       break;
@@ -99,7 +97,10 @@ function parseLink(jsonLink, pages){
   var linkToText = jsonLink.details;
   if ( linkToText == null || linkToText == '' ){ linkToText = linkToPage }
 
-  var linkTemplate = '<p> <a href="#{url}"> #{name} </a></p>' + '\n';
+  var linkTemplate = 
+    "      p" + '\n' +
+    "        a(href='#{url}')  #{name}"+ '\n';
+
   var linkValues = { url: url, name: linkToText };
   var linkCode = $.tmpl(linkTemplate, linkValues);
 

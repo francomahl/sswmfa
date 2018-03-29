@@ -7,7 +7,8 @@ function parseForm(jsonForm){
     var inputType = '';
 
     if ( jsonForm.fields[form].display == true ){
-      switch(true) {
+      //----- Update when multiple types are supported  -----
+      /*switch(true) {
         case fieldType.includes('bool'):
             inputType = 'checkbox';
             break;
@@ -26,7 +27,10 @@ function parseForm(jsonForm){
         default:
             inputType = 'text';
       } // end switch
-      if (inputType == 'checkbox'){
+      if (inputType == 'checkbox'){*/ 
+      inputType = 'text';  
+      if (false){
+      //----- Update when multiple types are supported  -----
          var inputTemplate = "          .form-check" + '\n' +
                              "            label.form-check-label" + '\n' +
                              "              input.form-check-input(type='#{inputType}')" + '\n' +
@@ -43,11 +47,11 @@ function parseForm(jsonForm){
   }// end for
 
   var formTemplate = "        h3  #{name}" + '\n' +
-                     '        form(action="#")' + '\n' +
+                     '        form(action="/rendered/insertOneIn#{formClass}", method="POST")' + '\n' +
                      '#{elements}' + '\n' +
                      "          br" + '\n' +
                      "          button.btn.btn-primary(type='submit') Submit" + '\n';
-  var formValues = { name: jsonForm.name, elements: elements };
+  var formValues = { name: jsonForm.name, elements: elements, formClass: jsonForm.fields[form].class.split(" ").join("_") };
   var formCode = $.tmpl(formTemplate, formValues);
 
   return formCode;

@@ -14,7 +14,8 @@
     "gojs": "^1.8.14",
     "jade": "^1.11.0",
     "morgan": "~1.9.0",
-    "serve-favicon": "~2.4.5"
+    "serve-favicon": "~2.4.5",
+    "sqlite3": "^4.0.0"
   },
   "devDependencies": {
     "nodemon": "^1.17.1"

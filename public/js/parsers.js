@@ -59,7 +59,7 @@ function parseList(jsonList){
 
   for( var lf = 0; lf < jsonList.fields.length; lf++ ){
     if ( jsonList.fields[lf].display == true ){
-      var headerTemplate = '            th  #{name}' + '\n';
+      var headerTemplate = '              th  #{name}' + '\n';
       var headerValues = { name: jsonList.fields[lf].name };
       var header = $.tmpl(headerTemplate, headerValues);
       headers = headers + header;
@@ -67,9 +67,11 @@ function parseList(jsonList){
   }// end for
 
   var listTemplate = "        h3  #{name}" + '\n' +
-                     '        table' + '\n' +
-                     '          tr' + '\n' +
-                     '#{headers}'+ '\n';
+                     "        table" + '\n' +
+                     '          thead' + '\n' +
+                     '            tr' + '\n' +
+                     '#{headers}'+ '\n' + 
+                     '          tbody' + '\n';
   var listValues = { name: jsonList.name, headers: headers };
   var listCode = $.tmpl(listTemplate, listValues);
 

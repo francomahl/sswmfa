@@ -148,15 +148,13 @@ function initNav() {
     {
       contextMenu: myContextMenu,
       locationSpot: go.Spot.Center,
-      fromSpot: go.Spot.AllSides,
-      toSpot: go.Spot.AllSides,
       // dropping on a Node is the same as dropping on its containing Group, even if it's top-level
       mouseDrop: function(e, nod) { finishDrop(e, nod.containingGroup); }
     },
     GO(go.Shape,
         {
           portId: "", // the default port: if no spot on link data, use closest side
-          fromLinkable: true, toLinkable: true, cursor: "pointer",
+          cursor: "pointer",
           fill: "white",  // default color
           strokeWidth: 2
         }),
@@ -174,12 +172,18 @@ function initNav() {
           font: "bold 12pt sans-serif",
           isMultiline: false, editable: true
         },
-//        new go.Binding("text", "key").makeTwoWay(),
-        new go.Binding("text", "name").makeTwoWay()),
-      // fields
+      // class  
+      new go.Binding("text", "name").makeTwoWay()
+      ),
+    ]
+  }
+
+function commonNodeFieldPannels(){
+  return[
+      // class
       GO(go.Panel, "Horizontal",
         {
-          row: 1, margin: 3,
+          row: 2, margin: 3,
           defaultAlignment: go.Spot.Center
         },
         GO(go.TextBlock,  // Shows the class is related to
@@ -187,26 +191,27 @@ function initNav() {
               editable: false},
             new go.Binding("text","class").makeTwoWay())
       ),
+      //fields
       GO(go.Panel, "Vertical",
        new go.Binding("itemArray", "fields"),
         {
-          row: 2, margin: 3, stretch: go.GraphObject.Fill,
+          row: 3, margin: 3, stretch: go.GraphObject.Fill,
           defaultAlignment: go.Spot.Left,
           itemTemplate: fieldTemplate
         }
       ),
-    ]
-  }
-
+      GO(go.TextBlock,
+        { visible: false },
+        new go.Binding("text","comments").makeTwoWay()
+      )
+  ]
+}
   // Node Form
   navDiagram.nodeTemplateMap.add("Form",
   GO(go.Node, "Auto",commonNodeStyle(),
     GO(go.Panel, "Table",
       commonNodePanels(),
-      GO(go.TextBlock,
-        { isMultiline: true, visible: false },
-        new go.Binding("text","comments").makeTwoWay()
-      )
+      commonNodeFieldPannels()
     )
   ));
 
@@ -215,16 +220,54 @@ function initNav() {
   GO(go.Node, "Auto", commonNodeStyle(),
     GO(go.Panel, "Table",
       commonNodePanels(),
-      GO(go.TextBlock,
-        { visible: false },
-        new go.Binding("text","comments").makeTwoWay()
+      //fields
+      GO(go.Panel, "Horizontal",
+        {row:1},
+        GO(go.TextBlock, "detail", {margin: 3}),
+        GO("CheckBox", "detail",
+          { column: 0, defaultAlignment: go.Spot.Right, "ButtonIcon.stroke": "green" },        
+        ),
+        GO(go.TextBlock, "edit", {margin: 3}),
+        GO("CheckBox", "edit",
+          { column: 1, defaultAlignment: go.Spot.Right, "ButtonIcon.stroke": "green" },
+        ),
+        GO(go.TextBlock, "delete", {margin: 3}),
+        GO("CheckBox", "delete",
+          { column: 2, defaultAlignment: go.Spot.Right, "ButtonIcon.stroke": "green" },
+        )
       ),
-      GO(go.TextBlock,
-        { isMultiline: true, visible: false },
-        new go.Binding("text","type").makeTwoWay()
-      )
+      commonNodeFieldPannels()
     )
   ));
+
+  navDiagram.nodeTemplateMap.add("Script",
+    GO(go.Node, "Auto",
+    { locationSpot: go.Spot.Center,
+      mouseDrop: function(e, nod) { finishDrop(e, nod.containingGroup); }
+    },
+    GO(go.Shape, "File",
+      {
+        fill: "white", portId: "", cursor: "pointer",  // the Shape is the port, not the whole Node
+        // allow all kinds of links from and to this port
+        fromLinkable: true, fromLinkableSelfNode: true, fromLinkableDuplicates: true,
+        toLinkable: true, toLinkableSelfNode: true, toLinkableDuplicates: true
+      },
+      new go.Binding("fill", "color")),
+    GO(go.Panel, "Table",
+      GO(go.TextBlock,
+        { row: 0, isMultiline: false, editable: true, margin: 3, font: "bold 12pt sans-serif" },
+        new go.Binding("text", "name").makeTwoWay()
+      ),    
+      GO(go.TextBlock,
+        {
+          row:1, font: "8pt courier", stroke: '#333',
+          margin: 6, isMultiline: true, editable: true,
+          maxSize: new go.Size(150, 200)
+        },
+        new go.Binding("text", "text").makeTwoWay()
+      )
+    )
+  ));    
 
   // On selection changed, make sure infoDraggable will resize as necessary
   navDiagram.addDiagramListener("ChangedSelection", function(diagramEvent) {
@@ -274,9 +317,8 @@ function initNav() {
         layout: GO(go.GridLayout, { wrappingColumn: 1, alignment: go.GridLayout.Position }),
         model: new go.GraphLinksModel([  // specify the contents of the Palette
           { category: "Form", name: "Form", class: "No Class selected", fields: [{ name: "field1", type: "dataType", display: true }], comments: ""},
-          { category: "List", name: "Simple List", class: "No Class selected", fields: [{ name: "field1", type: "dataType", display: true }], type:"Simple List", comments: ""},
-          { category: "List", name: "List", class: "No Class selected", fields: [{ name: "field1", type: "dataType", display: true }], type:"List", comments: ""},
-          { category: "List", name: "Checkeable List", class: "No Class selected", fields: [{ name: "field1", type: "dataType", display: true }], type:"Checkeable List", comments: ""},
+          { category: "List", name: "List", class: "No Class selected", fields: [{ name: "field1", type: "dataType", display: true }], comments: ""},
+          { category: "Script", name: "Script", text: "Insert script here"},
           { name: "Page", isGroup: true, category:"Page" }
         ])
       });
@@ -292,7 +334,6 @@ function initNav() {
             "key": { readOnly: true, show: Inspector.showIfPresent },
             "name": { readOnly: true, show: Inspector.showIfPresent },
             "category": { readOnly: true, show: Inspector.showIfPresent },
-            "type": { readOnly: true, show: Inspector.showIfPresent },
             "comments": { show: Inspector.showIfPresent },
             // Links properties
             "from": { readOnly: true, show: Inspector.showIfPresent },
@@ -302,7 +343,7 @@ function initNav() {
         });
       });
 
-// setup a main page
+// setup the nav page
   var nodedata = [
     { name: "Index", isGroup: true, category:"MainPage" }];
 

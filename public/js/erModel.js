@@ -34,15 +34,6 @@ function initER() {
 
   var propertyTemplate =
     GO(go.Panel, "Horizontal",
-      GO(go.TextBlock,
-        { isMultiline: false, editable: true },
-        new go.Binding("text", "name").makeTwoWay()),
-      // property type
-      GO(go.TextBlock, ":",
-        {editable: false}),
-      GO(go.TextBlock,
-        { isMultiline: false, editable: true },
-        new go.Binding("text", "type").makeTwoWay()),
       GO("Button",
         {
           alignment: go.Spot.Right,
@@ -52,7 +43,20 @@ function initER() {
         },
         GO(go.TextBlock, "-",  // the Button content
           { font: "bold 8pt sans-serif" })
-      )
+      ),      
+      GO(go.TextBlock,
+        { isMultiline: false, editable: true },
+        new go.Binding("text", "name").makeTwoWay()),
+      // property type
+      GO(go.TextBlock, ":",
+        {editable: false}),
+      GO(go.TextBlock,
+        { isMultiline: false, editable: true },
+        new go.Binding("text", "type").makeTwoWay()),
+      GO("CheckBox", "pk",
+        { margin: 3,  "ButtonIcon.stroke": "green" }),
+      GO("CheckBox", "nullable",
+        { margin: 3,  "ButtonIcon.stroke": "green" }),      
     );
     //Properties functions
   function addProperty(e, obj) {
@@ -118,8 +122,6 @@ function initER() {
             row: 1, margin: 3,
             defaultAlignment: go.Spot.Center
           },
-          GO(go.TextBlock, "properties",  // the Button content
-              { font: "bold 8pt sans-serif" }),
           GO(go.Panel, "Vertical",
               {
                   column:0, margin: 3
@@ -131,8 +133,41 @@ function initER() {
                   click: addProperty  // adds new property to the class
                 },
                 GO(go.TextBlock, "+",  // the Button content
-                  { font: "bold 8pt sans-serif" })
+                  { font: "bold 8pt sans-serif" }
+                )
               )
+          ),
+          GO(go.Panel, "Vertical",
+              {
+                  column:1, margin: 3
+              },
+              GO(go.TextBlock, "name:",  // the Button content
+                  { font: "bold 8pt sans-serif" }
+              )
+          ),
+          GO(go.Panel, "Vertical",
+              {
+                  column:2, margin: 3
+              },
+              GO(go.TextBlock, "type",  // the Button content
+                  { font: "bold 8pt sans-serif" }
+              ),
+          ),
+          GO(go.Panel, "Vertical",
+              {
+                  column:3, margin: 3
+              },
+              GO(go.TextBlock, "pk",  // the Button content
+                  { font: "bold 8pt sans-serif" }
+              ),
+          ),
+          GO(go.Panel, "Vertical",
+              {
+                  column:3, margin: 3
+              },
+              GO(go.TextBlock, "nullable",  // the Button content
+                  { font: "bold 8pt sans-serif" }
+              ),
           )
         ),
         GO(go.Panel, "Vertical",

@@ -2,11 +2,11 @@
 function parseForm(jsonForm){
   var elements = '';
 
-  for( var fd = 0; fd < jsonForm.fields.length; fd++ ){
-    var fieldType = jsonForm.fields[fd].type.toLowerCase();
+  for( var form = 0; form < jsonForm.fields.length; form++ ){
+    var fieldType = jsonForm.fields[form].type.toLowerCase();
     var inputType = '';
 
-    if ( jsonForm.fields[fd].display == true ){
+    if ( jsonForm.fields[form].display == true ){
       switch(true) {
         case fieldType.includes('bool'):
             inputType = 'checkbox';
@@ -36,7 +36,7 @@ function parseForm(jsonForm){
                             "            label  #{name}" + '\n' +
                             "            input.form-control(type='#{inputType}')" + '\n';
       }
-      var inputValues = { name: jsonForm.fields[fd].name , inputType: inputType };
+      var inputValues = { name: jsonForm.fields[form].name , inputType: inputType };
       var input = $.tmpl(inputTemplate, inputValues);
       elements = elements + input;
     }// end if display true
@@ -57,10 +57,10 @@ function parseForm(jsonForm){
 function parseList(jsonList){
   var headers = '';
 
-  for( var lf = 0; lf < jsonList.fields.length; lf++ ){
-    if ( jsonList.fields[lf].display == true ){
+  for( var list = 0; list < jsonList.fields.length; list++ ){
+    if ( jsonList.fields[list].display == true ){
       var headerTemplate = '              th  #{name}' + '\n';
-      var headerValues = { name: jsonList.fields[lf].name };
+      var headerValues = { name: jsonList.fields[list].name };
       var header = $.tmpl(headerTemplate, headerValues);
       headers = headers + header;
     }// end if display true
@@ -83,12 +83,12 @@ function parseLink(jsonLink, pages){
   var linkToPage = 'home';
   var url = 'http://localhost:3000/render';
 
-  for( var lp = 0; lp < pages.length; lp++ ){
-    if( jsonLink.to == pages[lp].key ){
-      if(pages[lp].category == "MainPage"){
+  for( var link = 0; link < pages.length; link++ ){
+    if( jsonLink.to == pages[link].key ){
+      if(pages[link].category == "MainPage"){
         url = 'http://localhost:3000/render/';
       }else{
-        linkToPage = pages[lp].name;
+        linkToPage = pages[link].name;
         linkToPage = linkToPage.toLowerCase().split(" ").join("_");
         url = 'http://localhost:3000/render/'+ linkToPage;
       }

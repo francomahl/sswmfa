@@ -6,4 +6,9 @@ router.get('/', function (req, res) {
   res.render('rendered/index', { title: 'Index' });
 });
 
+router.get("/createTables", function(req, res){
+ SDB.createTables();
+ res.end();
+});
+
 module.exports = router;

@@ -30,9 +30,10 @@ function initNav() {
       var button = $("#SaveNavButton");
       if (button) button.disabled = !navDiagram.isModified;
       if (navDiagram.isModified) {
-          button.text('Save*');
+          button.text('Convert to JSON*');
+          $('#PlayButton').prop('disabled', true); // Disable Play button on Nav Model
       } else {
-          button.text('Save');
+          button.text('Convert to JSON');
       }
   });
 

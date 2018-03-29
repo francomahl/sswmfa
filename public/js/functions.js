@@ -99,3 +99,24 @@ function loadERDiagramProperties(e) {
   var pos = erDiagram.model.modelData.position;
   if (pos) erDiagram.initialPosition = go.Point.parse(pos);
 }
+
+function createFile(fileContent, fileName, dir, dataType ){
+  var data = {};
+  data.fileContent = fileContent;
+  data.fileName = fileName
+  data.dir = dir
+
+  $.ajax({
+    type: 'POST',
+    dataType: dataType,
+    data: JSON.stringify(data),
+    contentType: "application/json; charset=utf-8",
+    url: 'http://localhost:3000/createFile',
+    converters: {
+      'text json': true
+    },
+    success: function(data) {
+      console.log('success')
+    }
+  });
+}

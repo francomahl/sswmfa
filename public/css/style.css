@@ -115,3 +115,11 @@
     margin-left: 0px;
     margin-top: 0px;
   }
+
+  .btn.btn-primary,
+  .btn.btn-secondary,
+  .btn.btn-danger,
+  .btn.btn-success,
+  .btn.btn-basic{
+    margin:0.5rem;
+  }

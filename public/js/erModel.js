@@ -26,9 +26,12 @@ function initER() {
       var button = $("#SaveERButton");
       if (button) button.disabled = !erDiagram.isModified;
       if (erDiagram.isModified) {
-          button.text('Save*');
+          button.text('Convert to JSON*');
+          $('#createTableButton').prop('disabled', true); // Disable create tables button
+          $('#CreateRoutesButton').prop('disabled', true); // Disable Create Routes button on Nav Model
+          $('#PlayButton').prop('disabled', true); // Disable Play button on Nav Model
       } else {
-          button.text('Save');
+          button.text('Convert to JSON');
       }
   });
 
@@ -53,8 +56,9 @@ function initER() {
       GO(go.TextBlock,
         { isMultiline: false, editable: true },
         new go.Binding("text", "type").makeTwoWay()),
-      GO("CheckBox", "pk",
-        { margin: 3,  "ButtonIcon.stroke": "green" }),
+      GO("CheckBox", "unique",
+        { margin: 3,  "ButtonIcon.stroke": "green" },
+      ),
       GO("CheckBox", "nullable",
         { margin: 3,  "ButtonIcon.stroke": "green" }),      
     );
@@ -66,7 +70,7 @@ function initER() {
     e.handled = true;
     var arr = adorn.data.properties;
     erDiagram.startTransaction("add property");
-    erDiagram.model.addArrayItem(arr, {name: "property", type: "type"});
+    erDiagram.model.addArrayItem(arr, {name: "property", type: "type", unique:false, nullable:false});
     erDiagram.commitTransaction("add property");
   }
 
@@ -157,7 +161,7 @@ function initER() {
               {
                   column:3, margin: 3
               },
-              GO(go.TextBlock, "pk",  // the Button content
+              GO(go.TextBlock, "unique",  // the Button content
                   { font: "bold 8pt sans-serif" }
               ),
           ),
@@ -262,7 +266,7 @@ function initER() {
             ),
         model: new go.GraphLinksModel([  // specify the contents of the Palette
           { name: "Class",
-            properties: [{ name: "property", type: "type" }]}
+            properties: [{ name: "property", type: "type", unique:false, nullable:false }]}
         ])
       });
 
@@ -272,3 +276,88 @@ function initER() {
       copiesArrayObjects: true
     });
 };
+
+//Create DB
+
+function createDB(){
+  const dbName = "SDB";
+  var queries = "";
+  //call save()
+  saveER();
+  queries = createQueries();
+
+  //Create DB file
+  var dbConfigTemplate = 
+  "var sqlite3 = require('sqlite3').verbose(),"+ '\n' +
+  "db = new sqlite3.Database('sswmfa.sql'),"+ '\n' +
+  '#{dbName} = {};'+ '\n' +
+  '#{queries}'+ '\n' +
+  'module.exports = #{dbName};' + '\n';
+
+  var dbConfigValues = { queries: queries, dbName: dbName };
+  var dbConfigContent = $.tmpl(dbConfigTemplate, dbConfigValues);
+
+  createFile(dbConfigContent, "db.js", '../models/', "script" );
+
+  $('#createTableButton').prop('disabled', false);
+};
+
+function createTables(){
+  //create db tables
+  $.ajax({
+    type: 'GET',
+    url: 'http://localhost:3000/render/createTables',
+    success: function(data) {
+      console.log('tables created');
+      $('#CreateRoutesButton').prop('disabled', false);
+      $('#createTableButton').prop('disabled', true);
+    }
+  });
+}
+
+function createQueries(){
+  var dbQueries = "";
+  if (erClasses.length < 1) {
+    return dbQueries
+  }; // if there are no classes then exit
+
+  dbQueries = 
+  //create tables function
+  "SDB.createTables = function()"+ '\n' +
+  "{"+ '\n';
+
+  for ( var classIndex = 0; classIndex < erClasses.length; classIndex++ ){
+    var uniquesCount = 0;
+    var iLastComma = 0;
+    var uniques = ', UNIQUE (id,';
+    dbQueries +=
+    ' db.run("DROP TABLE IF EXISTS ' + erClasses[classIndex].name.split(" ").join("_") + ' ");'+ '\n' +
+    ' db.run("CREATE TABLE IF NOT EXISTS ' + erClasses[classIndex].name.split(" ").join("_") + ' (id INTEGER PRIMARY KEY AUTOINCREMENT,';
+    for ( var classFieldI = 0; classFieldI < erClasses[classIndex].properties.length; classFieldI++ ){
+      if (erClasses[classIndex].properties[classFieldI].nullable){
+        dbQueries += ' ' +  erClasses[classIndex].properties[classFieldI].name.split(" ").join("_") + ' TEXT NOT NULL,';
+      } else {
+        dbQueries += ' ' +  erClasses[classIndex].properties[classFieldI].name.split(" ").join("_") + ' TEXT,';
+      };
+      if (erClasses[classIndex].properties[classFieldI].unique){
+        uniquesCount ++;
+        uniques += erClasses[classIndex].properties[classFieldI].name.split(" ").join("_") + ', ';
+      };
+    };
+    //Remove last comma from dbQueries
+    iLastComma = dbQueries.lastIndexOf(',');
+    dbQueries = dbQueries.slice(0, iLastComma) + dbQueries.slice(iLastComma).replace(',', '');
+    //check if there are unique columns
+    if ( uniquesCount > 0 ){
+      //Remove last comma from uniques
+      iLastComma = uniques.lastIndexOf(',');
+      uniques = uniques.slice(0, iLastComma) + uniques.slice(iLastComma).replace(',', '');
+      dbQueries += uniques + '))");' + '\n';
+    } else {
+      dbQueries += ')");' + '\n'; 
+    }
+  };
+  dbQueries += '}' + '\n';
+
+  return dbQueries;
+}

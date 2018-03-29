@@ -2,3 +2,5 @@
 sswmfa.iml
 views/rendered
 node_modules/
+sswmfa.sql
+routes/render.bkp.js

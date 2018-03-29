@@ -20,9 +20,10 @@ html(lang='en')
     script(src='src/js/require.js')
     script(src='src/js/erModel.js')
     script(src='src/js/navModel.js')
-    script(src='src/js/parsers.js')
-    script(src='src/js/play.js')
     script(src='src/js/functions.js')
+    script(src='src/js/parsers.js')
+    script(src='src/js/createRoutes.js')
+    script(src='src/js/play.js')
   body(onload='initER();initNav();')
     ul#myTab.nav.nav-tabs(role='tablist')
       li.nav-item
@@ -39,9 +40,11 @@ html(lang='en')
               #erDiagramDiv.pdDiv
           div
             div
-              button#SaveERButton(onclick='saveER()') Save
-              button(onclick='loadER()') Load
-              |               Diagram Model saved in JSON format:
+              button.btn.btn-secondary#SaveERButton(onclick='saveER()') Convert to JSON
+              button.btn.btn-secondary(onclick='loadER()') Load JSON
+              button.btn.btn-primary(onclick='createDB()') Create DB
+              button(disabled="disabled").btn.btn-primary#createTableButton(onclick='createTables()') Create Tables
+              p Diagram Model in JSON format:
             textarea#mySavedERModel.mySavedModel
               | { "class": "go.GraphLinksModel",
               | "nodeDataArray": [
@@ -61,11 +64,11 @@ html(lang='en')
               #myInfo
           div
             div
-              button#SaveNavButton(onclick='saveNav()') Save
-              button#SaveNavButton(onclick='play()') Play
-              button(onclick='loadNav()') Load
-              | key
-              |               Diagram Model saved in JSON format:
+              button.btn.btn-secondary#SaveNavButton(onclick='saveNav()') Convert to JSON
+              button.btn.btn-secondary(onclick='loadNav()') Load JSON
+              button(disabled="disabled").btn.btn-primary#CreateRoutesButton(onclick='createRoutes()') Create routes to pages
+              button(disabled="disabled").btn.btn-primary#PlayButton(onclick='play()') Play
+              p Diagram Model in JSON format:
             textarea#mySavedNavModel.mySavedModel
               | { "class": "go.GraphLinksModel",
               | "nodeDataArray": [

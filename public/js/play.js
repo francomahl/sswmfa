@@ -1,75 +1,69 @@
 function play(){
-  const dbName = "SDB";
   //using JQuery's extend function to copy array value and not the reference
   var navNodes = $.extend(true, [], navDiagram.model.nodeDataArray),
       navLinks = $.extend(true, [], navDiagram.model.linkDataArray),
       pages = [],
       forms = [],
       lists = [],
-      scripts = [],
-      routes = "",
-      queries = "";
-  
-  queries = createQueries();
+      scripts = [];
 
   //Divide nodes by category
-  for ( var i = 0; i < navNodes.length; i++){
-      if ( navNodes[i].category == "MainPage" || navNodes[i].category == "Page" ){
-        pages.push(navNodes[i]);
-      } else if ( navNodes[i].category == "Form" ){
-        forms.push(navNodes[i]);
-      } else if ( navNodes[i].category == "List"){
-        lists.push(navNodes[i]);
-      } else if ( navNodes[i].category == "Script"){
-        scripts.push(navNodes[i]);
+  for ( var nodeToCategorize = 0; nodeToCategorize < navNodes.length; nodeToCategorize++){
+      if ( navNodes[nodeToCategorize].category == "MainPage" || navNodes[nodeToCategorize].category == "Page" ){
+        pages.push(navNodes[nodeToCategorize]);
+      } else if ( navNodes[nodeToCategorize].category == "Form" ){
+        forms.push(navNodes[nodeToCategorize]);
+      } else if ( navNodes[nodeToCategorize].category == "List"){
+        lists.push(navNodes[nodeToCategorize]);
+      } else if ( navNodes[nodeToCategorize].category == "Script"){
+        scripts.push(navNodes[nodeToCategorize]);
       }
   }
 
 //Iterate over pages
-  for ( var p = 0; p < pages.length; p++ ){
+  for ( var pageInProcess = 0; pageInProcess < pages.length; pageInProcess++ ){
     var pageForms = '',
         pageLists = '',
         pageLinks = '',
         content =  '',
         importScripts = 'block append scripts' + '\n';
 
-    for ( var f = 0; f < forms.length; f++ ){
+    for ( var formInProcess = 0; formInProcess < forms.length; formInProcess++ ){
       //parse forms within group
-      if( forms[f].group == pages[p].key ){
-        pageForms = pageForms + parseForm(forms[f]) + '\n';
+      if( forms[formInProcess].group == pages[pageInProcess].key ){
+        pageForms = pageForms + parseForm(forms[formInProcess]) + '\n';
       }
     }
 
-    for ( var l = 0; l < lists.length; l++ ){
+    for ( var listInProcess = 0; listInProcess < lists.length; listInProcess++ ){
       //parse lists within group
-       if ( lists[l].group == pages[p].key ){
-        pageLists = pageLists + parseList(lists[l]) + '\n';
+       if ( lists[listInProcess].group == pages[pageInProcess].key ){
+        pageLists = pageLists + parseList(lists[listInProcess]) + '\n';
       }
     };
 
-    for( var k = 0; k < navLinks.length; k++ ){
+    for( var linkInProcess = 0; linkInProcess < navLinks.length; linkInProcess++ ){
       //parse links within group
-      if(navLinks[k].from == pages[p].key ){
-        pageLinks = pageLinks + parseLink(navLinks[k], pages) + '\n';
+      if(navLinks[linkInProcess].from == pages[pageInProcess].key ){
+        pageLinks = pageLinks + parseLink(navLinks[linkInProcess], pages) + '\n';
       }
     };
 
-    for ( var s = 0; s < scripts.length; s++ ){
+    for ( var scriptInProcess = 0; scriptInProcess < scripts.length; scriptInProcess++ ){
       //parse lists within group
-       if ( scripts[s].group == pages[p].key ){
-        createFile(scripts[s].text, scripts[s].name, '../views/rendered/', "script" );
-        importScripts = importScripts + "script(src='/"+scripts[s].name+"')" + '\n';
+       if ( scripts[scriptInProcess].group == pages[pageInProcess].key ){
+        createFile(scripts[scriptInProcess].text, scripts[scriptInProcess].name, '../views/rendered/', "script" );
+        importScripts = importScripts + "script(src='/"+scripts[scriptInProcess].name+"')" + '\n';
       }
     };  
 
     content =  pageForms + pageLists + pageLinks;
 
     //Create jade file
-
     var fileHeader = "extends ../layout" + '\n';
 
     if (scripts.length > 0) {
-      fileHeader = fileHeader + importScripts;
+      fileHeader += importScripts;
     };
 
     var fileContent =
@@ -83,85 +77,17 @@ function play(){
     var fileTemplate = fileHeader + fileContent;
     var myValues = { content: content };
     var htmlCode = $.tmpl(fileTemplate, myValues);
-    var fileName = pages[p].name;
+    var fileName = pages[pageInProcess].name;
     fileName = fileName.toLowerCase().split(" ").join("_");
     fileNameToSaveAs = fileName + ".jade"
 
-    //call function to create html file
+    //call function to create jade file
     createFile(htmlCode, fileNameToSaveAs,'../views/rendered/', "jade");
-
-    //Create router for the new file
-    var getLine = "router.get('/#{name}', function(req, res) {";
-    if (pages[p].category == "MainPage"){ // For MainPage we set the route to '/'
-      getLine = "router.get('/', function (req, res) {";
-    };
-
-    var routerTemplate = getLine + '\n' +
-    "  res.render('rendered/#{name}', { title: '#{pageName}' });"+ '\n' +
-    "});"+ '\n';
-
-    var routerValues = { name: fileName, pageName: pages[p].name };
-    var route = $.tmpl(routerTemplate, routerValues);
-    routes = routes + route
-
-  }
-
-  //Create DB file
-  var dbConfigTemplate = 
-  "var sqlite3 = require('sqlite3').verbose(),"+ '\n' +
-  "db = new sqlite3.Database('sswmfa'),"+ '\n' +
-  '#{dbName} = {};'+ '\n' +
-  '#{queries}'+ '\n' +
-  'module.exports = #{dbName};' + '\n';
-
-  var dbConfigValues = { queries: queries, dbName: dbName };
-  var dbConfigContent = $.tmpl(dbConfigTemplate, dbConfigValues);
-
-  createFile(dbConfigContent, "db.js", '../models/', "script" );
-
-
-  //Create render.js file which contains routes to the new files and gateways 
-  var routerContentTemplate = 
-  "var express = require('express');" + '\n' +
-  "var router = express.Router();" + '\n' +
-  "var #{dbName} = require('../models/db');" + '\n' +
-  "//below autogenerated routes" + '\n' +
-  "#{routes}"+ '\n' +
-  "module.exports = router;"+ '\n';
-
-  var routerContentValues = { routes: routes, dbName: dbName };
-  var routerContent = $.tmpl(routerContentTemplate, routerContentValues);
-  //call function to create router for render
-  createFile(routerContent, "render.js", '../routes/', "script" );
+  } // end for each page
 
   //open tab index
   window.open(
     'http://localhost:3000/render',
     '_blank'
   );
-}
-
-function createFile(fileContent, fileName, dir, dataType ){
-  var data = {};
-  data.fileContent = fileContent;
-  data.fileName = fileName
-  data.dir = dir
-
-  $.ajax({
-    type: 'POST',
-    dataType: dataType,
-    data: JSON.stringify(data),
-    contentType: "application/json; charset=utf-8",
-    url: 'http://localhost:3000/createFile',
-    converters: {
-      'text json': true
-    },
-    success: function(data) {
-      console.log('success')
-    }
-  });
-}
-
-function createQueries(){
-  return " ";
-}
+} // end play()

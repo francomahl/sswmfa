@@ -130,7 +130,7 @@ function createQueries(dbName){
      '          if(row)' +'\n'+
      '          { callback("", row); }' +'\n'+
      '          else' +'\n'+
-     '          { console.log("Record not found"); }}' +'\n'+
+     '          { callback("Record not found", null) }}' +'\n'+
      '  });}'+ '\n'+ '\n';
 
      dbQueries +=

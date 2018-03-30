@@ -20,7 +20,7 @@ function play(){
       }
   }
 
-//Iterate over pages
+  //Iterate over pages
   for ( var pageInProcess = 0; pageInProcess < pages.length; pageInProcess++ ){
     var pageForms = '',
         pageLists = '',
@@ -37,7 +37,7 @@ function play(){
 
     for ( var listInProcess = 0; listInProcess < lists.length; listInProcess++ ){
       //parse lists within group
-       if ( lists[listInProcess].group == pages[pageInProcess].key ){
+      if ( lists[listInProcess].group == pages[pageInProcess].key ){
         pageLists = pageLists + parseList(lists[listInProcess]) + '\n';
       }
     };

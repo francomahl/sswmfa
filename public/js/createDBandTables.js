@@ -54,9 +54,9 @@ function createQueries(dbName){
     ' db.run("CREATE TABLE IF NOT EXISTS ' + erClasses[classIndex].name.split(" ").join("_") + ' (id INTEGER PRIMARY KEY AUTOINCREMENT,';
     for ( var classFieldI = 0; classFieldI < erClasses[classIndex].properties.length; classFieldI++ ){
       if (erClasses[classIndex].properties[classFieldI].nullable){
-        dbQueries += ' ' +  erClasses[classIndex].properties[classFieldI].name.split(" ").join("_") + ' TEXT NOT NULL,';
-      } else {
         dbQueries += ' ' +  erClasses[classIndex].properties[classFieldI].name.split(" ").join("_") + ' TEXT,';
+      } else {
+        dbQueries += ' ' +  erClasses[classIndex].properties[classFieldI].name.split(" ").join("_") + ' TEXT NOT NULL,';
       };
       if (erClasses[classIndex].properties[classFieldI].unique){
         uniquesCount ++;

@@ -130,16 +130,24 @@ function createEditPage(jsonList){
 		inputType = 'text';
 		if (false){
 		//----- Update when multiple types are supported -----
+
 			var inputTemplate = 
 			"					.form-check" + '\n' +
 			"						label.form-check-label" + '\n' +
 			"						input.form-check-input(id='#{fieldName}', name='#{fieldName}', type='#{inputType}', value=record.#{fieldName})" + '\n' +
 			"						| #{name}" + '\n';
 		} else {
-			var inputTemplate = 
-			"					.form-group" + '\n' +
-			"						label #{name}" + '\n' +
-			"						input.form-control(id='#{fieldName}', name='#{fieldName}', type='#{inputType}', value=record.#{fieldName})" + '\n';
+      var inputTemplate = "					.form-group" + '\n';
+      if ( !jsonList.fields[fieldIndex].nullable ){  //if not nullable then add * and set input as required
+        inputTemplate += 
+          "						label #{name} *" + '\n' +
+          "						input.form-control(id='#{fieldName}', name='#{fieldName}', type='#{inputType}', value=record.#{fieldName}, required='')" + '\n';
+      }
+      else { 
+        inputTemplate += 
+          "						label #{name}" + '\n' +
+          "						input.form-control(id='#{fieldName}', name='#{fieldName}', type='#{inputType}', value=record.#{fieldName})" + '\n';
+      }
 		}
     var inputValues = { name: jsonList.fields[fieldIndex].name , fieldName: jsonList.fields[fieldIndex].name.split(" ").join("_") ,inputType: inputType };
     var input = $.tmpl(inputTemplate, inputValues);

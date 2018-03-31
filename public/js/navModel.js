@@ -31,6 +31,7 @@ function initNav() {
       if (button) button.disabled = !navDiagram.isModified;
       if (navDiagram.isModified) {
           button.text('Convert to JSON*');
+          $('#PagesButton').prop('disabled', true); // Disable Create Pages button on Nav Model
           $('#PlayButton').prop('disabled', true); // Disable Play button on Nav Model
       } else {
           button.text('Convert to JSON');
@@ -134,9 +135,16 @@ function initNav() {
         GO(go.TextBlock,
           { column: 0, isMultiline: false, editable: false, font: "bold 10pt sans-serif" },
           new go.Binding("text", "name").makeTwoWay()),
+        // received from DB
         GO(go.TextBlock,
           { column: 1, visible: false },
           new go.Binding("text", "type").makeTwoWay()),
+        GO("CheckBox", "unique",
+          { column: 3, visible: false },
+        ),
+        GO("CheckBox", "nullable",
+          { column: 4, visible: false },
+        ),                        
         // property display
         GO("CheckBox", "display",
           { column: 2, defaultAlignment: go.Spot.Right, "ButtonIcon.stroke": "green" },
@@ -314,8 +322,8 @@ function commonNodeFieldPannels(){
         groupTemplateMap: navDiagram.groupTemplateMap,
         layout: GO(go.GridLayout, { wrappingColumn: 1, alignment: go.GridLayout.Position }),
         model: new go.GraphLinksModel([  // specify the contents of the Palette
-          { category: "Form", name: "Form", class: "No Class selected", fields: [{ name: "field1", type: "dataType", display: true }], comments: ""},
-          { category: "List", name: "List", class: "No Class selected", fields: [{ name: "field1", type: "dataType", display: true }], comments: ""},
+          { category: "Form", name: "Form", class: "No Class selected", fields: [{ name: "field1", type: "dataType", unique: false, nullable: true, display: true }], comments: ""},
+          { category: "List", name: "List", class: "No Class selected", fields: [{ name: "field1", type: "dataType", unique: false, nullable: true, display: true }], comments: ""},
           { category: "Script", name: "Script", text: "Insert script here"},
           { name: "Page", isGroup: true, category:"Page" }
         ])

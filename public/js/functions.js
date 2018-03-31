@@ -33,7 +33,14 @@ function loadClassForm(diagram, erClass) {
         diagram.model.setDataProperty(data, "class", erClass.name);
         //Load fields from class' properties
         for (i=0; i < erClass.properties.length; i++){
-          diagram.model.addArrayItem(fields, {name: erClass.properties[i].name, type: erClass.properties[i].type, display: "yes"})}
+          diagram.model.addArrayItem(fields, {
+            name: erClass.properties[i].name, 
+            type: erClass.properties[i].type, 
+            unique: erClass.properties[i].unique,
+            nullable: erClass.properties[i].nullable,
+            display: true
+          })
+        }
     }
   });
   diagram.commitTransaction("add fields");

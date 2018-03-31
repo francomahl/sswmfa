@@ -90,7 +90,7 @@ function createRoutes(){
       routes +=
       'router.get("/updateOneIn'+className+'/:id", function(req, res){'+ '\n'+
       '  '+dbName+'.getOneFrom'+className+'( req.params.id, function(error, data){'+ '\n'+
-      '    if(error == ""){ res.render("rendered/formUpdateOneIn'+className+'", { record : data });}'+ '\n'+
+      '    if(error == ""){ res.render("rendered/formUpdateOneIn'+className+'", { title: "Update in '+erClasses[crudRouteIndex].name+'", record : data });}'+ '\n'+
       '    else { console.log(error); res.redirect("back"); }'+ '\n'+
       '  });'+ '\n'+
       '});'+ '\n'+ '\n';
@@ -110,7 +110,7 @@ function createRoutes(){
       routes +=
       'router.get("/detailOfOneFrom'+className+'/:id", function(req, res){'+ '\n'+
       '  '+dbName+'.getOneFrom'+className+'( req.params.id, function(error, data) {'+ '\n'+
-      '    res.render("rendered/detailFrom'+className+'", { record : data });'+ '\n'+
+      '    res.render("rendered/detailFrom'+className+'", { title: "Detail of record from '+erClasses[crudRouteIndex].name+'", record : data });'+ '\n'+
       '  });'+ '\n'+
       '});'+ '\n'+ '\n';
 
@@ -131,5 +131,5 @@ function createRoutes(){
   //call function to create router for render
   createFile(routerContent, "render.js", '../routes/', "script" );
 
-  $('#PlayButton').prop('disabled', false); //Enable step 2
+  $('#PagesButton').prop('disabled', false); //Enable step 2
 }// end function createRoutes()

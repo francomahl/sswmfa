@@ -24,6 +24,7 @@ html(lang='en')
     script(src='src/js/createDBandTables.js')
     script(src='src/js/parsers.js')
     script(src='src/js/createRoutes.js')
+    script(src='src/js/createPages.js')
     script(src='src/js/play.js')
   body(onload='initER();initNav();')
     ul#myTab.nav.nav-tabs(role='tablist')
@@ -67,15 +68,17 @@ html(lang='en')
             div
               button.btn.btn-secondary#SaveNavButton(onclick='saveNav()') Convert to JSON
               button.btn.btn-secondary(onclick='loadNav()') Load JSON
-              button(disabled="disabled").btn.btn-primary#CreateRoutesButton(onclick='createRoutes()') Create routes to pages
+              button(disabled="disabled").btn.btn-primary#CreateRoutesButton(onclick='createRoutes()') Create Routes
+              button(disabled="disabled").btn.btn-primary#PagesButton(onclick='createPages()') Create Pages
               button(disabled="disabled").btn.btn-primary#PlayButton(onclick='play()') Play
               p Diagram Model in JSON format:
             textarea#mySavedNavModel.mySavedModel
-              | { "class": "go.GraphLinksModel",
-              | "nodeDataArray": [
-              | ],
-              | "linkDataArray": [
-              | ]}
+              |  { "class": "go.GraphLinksModel",
+              |    "copiesArrays": true,
+              |    "copiesArrayObjects": true,
+              |    "modelData": {"position":"-498.84404500084605 -278.33671875"},
+              |    "nodeDataArray": [ {"name":"Index", "isGroup":true, "category":"MainPage", "key":-1} ],
+              |    "linkDataArray": []}
         #contextMenu
           ul#classes
             li#notFound  No classes found 

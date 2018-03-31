@@ -6,7 +6,7 @@ function parseForm(jsonForm){
     var fieldType = jsonForm.fields[fieldIndex].type.toLowerCase();
     var inputType = '';
 
-    if ( jsonForm.fields[fieldIndex].display == true ){
+    if ( jsonForm.fields[fieldIndex].display || !jsonForm.fields[fieldIndex].nullable ){ // if displayable or unique or not nullabe then shown in form
       //----- Update when multiple types are supported  -----
       /*switch(true) {
         case fieldType.includes('bool'):
@@ -36,13 +36,21 @@ function parseForm(jsonForm){
                              "						input.form-check-input(type='#{inputType}')" + '\n' +
                              "						|	#{name}" + '\n';
       } else {
-        var inputTemplate = "					.form-group" + '\n' +
-                            "						label	#{name}" + '\n' +
-                            "						input.form-control(id='#{fieldName}', name='#{fieldName}',type='#{inputType}')" + '\n';
+        var inputTemplate = "					.form-group" + '\n';
+        if ( !jsonForm.fields[fieldIndex].nullable ){  //if not nullable then add * and set input as required
+        	inputTemplate += 
+						"						label #{name} *" + '\n' +
+						"						input.form-control(id='#{fieldName}', name='#{fieldName}',type='#{inputType}', required='')" + '\n';
+        }
+        else { 
+        	inputTemplate += 
+						"						label #{name}" + '\n' +
+						"						input.form-control(id='#{fieldName}', name='#{fieldName}',type='#{inputType}')" + '\n';
+				}
       }
       var inputValues = { name: jsonForm.fields[fieldIndex].name , fieldName: jsonForm.fields[fieldIndex].name.split(" ").join("_") ,inputType: inputType };
       var input = $.tmpl(inputTemplate, inputValues);
-      elements = elements + input;
+      elements += input;
     }// end if display true
   }// end for
 
@@ -90,17 +98,17 @@ function parseList(jsonList){
 	if (jsonList.delete){
 		listTemplate +=
 		'									td ' + '\n'+
-		"										a.btn.btn-danger(href='render/deleteOneFrom#{formClass}/'+item.id, role='button') Delete" + '\n';
+		"										a.btn.btn-danger(href='/render/deleteOneFrom#{formClass}/'+item.id, role='button') Delete" + '\n';
 	}
 	if (jsonList.edit){
 		listTemplate +=
 		"									td" + '\n'+
-		"										a.btn.btn-primary(href='render/updateOneIn#{formClass}/'+item.id, role='button') Edit" + '\n';
+		"										a.btn.btn-primary(href='/render/updateOneIn#{formClass}/'+item.id, role='button') Edit" + '\n';
 	}
 		if (jsonList.detail){
 			listTemplate +=
 			"									td"  + '\n'+
-			"										a.btn.btn-secondary(href='render/detailOfOneFrom#{formClass}/'+item.id, role='button') Detail" + '\n';
+			"										a.btn.btn-secondary(href='/render/detailOfOneFrom#{formClass}/'+item.id, role='button') Detail" + '\n';
 	}										
   var listValues = { name: jsonList.name, headers: headers, details: details, formClass: jsonList.class.split(" ").join("_") };
   var listCode = $.tmpl(listTemplate, listValues);
@@ -111,16 +119,16 @@ function parseList(jsonList){
 //Parser for Links - from JSON to HTML
 function parseLink(jsonLink, pages){
   var linkToPage = 'home';
-  var url = 'http://localhost:3000/render';
+  var url = '/render/';
 
   for( var link = 0; link < pages.length; link++ ){
     if( jsonLink.to == pages[link].key ){
       if(pages[link].category == "MainPage"){
-        url = 'render/';
+        url = '/render/';
       }else{
         linkToPage = pages[link].name;
         linkToPage = linkToPage.toLowerCase().split(" ").join("_");
-        url = 'render/'+ linkToPage;
+        url = '/render/'+ linkToPage;
       }
       break;
     }

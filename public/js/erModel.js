@@ -29,6 +29,7 @@ function initER() {
           button.text('Convert to JSON*');
           $('#createTableButton').prop('disabled', true); // Disable create tables button
           $('#CreateRoutesButton').prop('disabled', true); // Disable Create Routes button on Nav Model
+          $('#PagesButton').prop('disabled', true); // Disable Create Pages button on Nav Model
           $('#PlayButton').prop('disabled', true); // Disable Play button on Nav Model
       } else {
           button.text('Convert to JSON');

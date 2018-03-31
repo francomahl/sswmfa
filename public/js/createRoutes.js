@@ -37,25 +37,31 @@ function createRoutes(){
     //if page contains list(s) this should get all the records in the table and send them to the template
     if (listsInPage.length > 0){
       var renderStmt = "  res.render('rendered/#{name}', { title: '#{pageName}', ";
-      for (var lipIndex = 0; lipIndex < listsInPage.length; lipIndex ++){
+
+      for (var lipIndex = 0; lipIndex < listsInPage.length; lipIndex ++){ // nesting calls to DB - THIS SHOULD BE RECURSIVE
         var listClassName = listsInPage[lipIndex].class.split(" ").join("_");
         routerTemplate += 
-        "  #{dbName}.getAllFrom"+listClassName+"(function(error, data)" + '\n'+
-        "  { var recordsFrom"+listClassName+" = data; });" + '\n' + '\n';
-        renderStmt += "recordsFrom"+listClassName+" : recordsFrom"+listClassName+", ";
+        "  #{dbName}.getAllFrom"+listClassName+"(function(error, recordsFrom"+listClassName+"){" + '\n'+ '  '; 
+        renderStmt += "  recordsFrom"+listClassName+" : recordsFrom"+listClassName+", ";
       }
-
       //Remove last comma from renderStmt
       var iLastComma = renderStmt.lastIndexOf(',');
       renderStmt = renderStmt.slice(0, iLastComma) + renderStmt.slice(iLastComma).replace(',', '');
-      routerTemplate +=  renderStmt + "});"+ '\n';
+      routerTemplate +=  renderStmt + "  });" + '\n'; // adding render to page statement
+
+      for (var lipIndex = 0; lipIndex < listsInPage.length; lipIndex ++){ // closing nested calls to DB - THIS SHOULD BE RECURSIVE
+        routerTemplate += "  });" + '\n';
+      } 
+
+      //Replace variables
       var routerValues = { name: fileName, pageName: pagesInRouting[pageToRouteI].name, dbName:dbName };
+
     } else {
       routerTemplate += 
       "  res.render('rendered/#{name}', { title: '#{pageName}' });"+ '\n';
       var routerValues = { name: fileName, pageName: pagesInRouting[pageToRouteI].name };
     }
-    routerTemplate += "});"+ '\n'+ '\n';
+    routerTemplate += "});"+ '\n'+ '\n';//Closing get function
     var route = $.tmpl(routerTemplate, routerValues);
     routes += route;
   }// end for create routes per page
@@ -78,7 +84,7 @@ function createRoutes(){
       routes +=
       'router.post("/insertOneIn'+className+'", function(req, res){'+ '\n'+
       '  '+dbName+'.insertOneIn'+className+'( req.body );'+ '\n'+
-      '  res.end();'+ '\n'+
+      "  res.redirect('back');"+ '\n'+
       '});'+ '\n'+ '\n';
 
       routes +=
@@ -92,13 +98,13 @@ function createRoutes(){
       routes +=
       'router.post("/updateOneIn'+className+'", function(req, res){'+ '\n'+
       '  '+dbName+'.updateOneIn'+className+'( req.body );'+ '\n'+
-      '  res.end();'+ '\n'+
+      "  res.redirect('back');"+ '\n'+
       '});'+ '\n'+ '\n';
 
       routes +=
       'router.get("/deleteOneFrom'+className+'/:id", function(req, res){'+ '\n'+
       '  '+dbName+'.deleteOneFrom'+className+'( req.params.id );'+ '\n'+
-      '  res.end();'+ '\n'+
+      "  res.redirect('back');"+ '\n'+
       '});'+ '\n'+ '\n';
 
       routes +=

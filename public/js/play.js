@@ -25,7 +25,7 @@ function play(){
     var pageForms = '',
         pageLists = '',
         pageLinks = '',
-        content =  '',
+        content =	'',
         importScripts = 'block append scripts' + '\n';
 
     for ( var formInProcess = 0; formInProcess < forms.length; formInProcess++ ){
@@ -52,8 +52,8 @@ function play(){
     for ( var scriptInProcess = 0; scriptInProcess < scripts.length; scriptInProcess++ ){
       //parse lists within group
        if ( scripts[scriptInProcess].group == pages[pageInProcess].key ){
-        createFile(scripts[scriptInProcess].text, scripts[scriptInProcess].name, '../views/rendered/', "script" );
-        importScripts = importScripts + "script(src='/"+scripts[scriptInProcess].name+"')" + '\n';
+        createFile(scripts[scriptInProcess].text, scripts[scriptInProcess].name, '../public/rendered/', "script" );
+        importScripts = importScripts + "	script(src='../../src/rendered/"+scripts[scriptInProcess].name+"')" + '\n';
       }
     };  
 
@@ -67,12 +67,12 @@ function play(){
     };
 
     var fileContent =
-      "block content" + '\n' +
-      "  .container-fluid" + '\n' +
-      "      div" + '\n' +
-      "#{content}" + '\n' +
-      "      footer" + '\n' +
-      "        p © SSWMFA - UNLP 2018";
+     "block content" + '\n' +
+     "	.container-fluid" + '\n' +
+     "			div" + '\n' +
+     "#{content}" + '\n' +
+     "			footer" + '\n' +
+     "				p © SSWMFA - UNLP 2018";
 
     var fileTemplate = fileHeader + fileContent;
     var myValues = { content: content };

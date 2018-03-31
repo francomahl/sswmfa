@@ -248,10 +248,7 @@ function commonNodeFieldPannels(){
     },
     GO(go.Shape, "File",
       {
-        fill: "white", portId: "", cursor: "pointer",  // the Shape is the port, not the whole Node
-        // allow all kinds of links from and to this port
-        fromLinkable: true, fromLinkableSelfNode: true, fromLinkableDuplicates: true,
-        toLinkable: true, toLinkableSelfNode: true, toLinkableDuplicates: true
+        fill: "white", portId: "", cursor: "pointer"  // the Shape is the port, not the whole Node
       },
       new go.Binding("fill", "color")),
     GO(go.Panel, "Table",

@@ -1,0 +1,40 @@
+{ "class": "go.GraphLinksModel",
+  "copiesArrays": true,
+  "copiesArrayObjects": true,
+  "modelData": {"position":"-15 -220.11758777203556"},
+  "nodeDataArray": [ 
+{"name":"Usuarios", "properties":[ {"name":"nombre", "type":"type", "unique":false, "nullable":false},{"name":"apellido", "type":"type", "unique":false, "nullable":false},{"name":"DNI", "type":"type", "unique":true, "nullable":true},{"name":"Direccion", "type":"type", "unique":false, "nullable":true},{"name":"usuario", "type":"type", "unique":true, "nullable":false},{"name":"password", "type":"type", "unique":false, "nullable":false} ], "key":-1, "loc":"400 140"},
+{"name":"Libros", "properties":[ {"name":"nombre", "type":"type", "unique":false, "nullable":false},{"name":"autor", "type":"type", "unique":false, "nullable":false},{"name":"paginas", "type":"type", "unique":false, "nullable":true},{"name":"editorial", "type":"type", "unique":false, "nullable":true},{"name":"detalle", "type":"type", "unique":false, "nullable":true} ], "key":-2, "loc":"670 -20"},
+{"name":"Factura", "properties":[ {"name":"lineas", "type":"type", "unique":false, "nullable":false},{"name":"total", "type":"type", "unique":false, "nullable":false},{"name":"usuario", "type":"type", "unique":false, "nullable":false},{"name":"fecha", "type":"type", "unique":false, "nullable":false} ], "key":-3, "loc":"150 -50"}
+ ],
+  "linkDataArray": [ 
+{"from":-1, "to":-2, "toText":"0..*", "text":"0..1"},
+{"from":-3, "to":-1, "text":"0..*"}
+ ]}
+
+{ "class": "go.GraphLinksModel",
+  "copiesArrays": true,
+  "copiesArrayObjects": true,
+  "modelData": {"position":"-491.34404500084605 -298.02792205810545"},
+  "nodeDataArray": [ 
+{"name":"Libreria online", "isGroup":true, "category":"MainPage", "key":-1},
+{"category":"List", "name":"List", "class":"Libros", "fields":[ {"name":"nombre", "type":"type", "unique":false, "nullable":false, "display":true},{"name":"autor", "type":"type", "unique":false, "nullable":false, "display":true},{"name":"paginas", "type":"type", "unique":false, "nullable":true, "display":false},{"name":"editorial", "type":"type", "unique":false, "nullable":true, "display":true},{"name":"detalle", "type":"type", "unique":false, "nullable":true, "display":false} ], "comments":"", "key":-2, "loc":"-340 -30", "group":-1, "detail":true},
+{"name":"Pagina de usuarios", "isGroup":true, "category":"Page", "key":-4},
+{"category":"Form", "name":"Crear usuario", "class":"Usuarios", "fields":[ {"name":"nombre", "type":"type", "unique":false, "nullable":false, "display":true},{"name":"apellido", "type":"type", "unique":false, "nullable":false, "display":true},{"name":"DNI", "type":"type", "unique":true, "nullable":true, "display":true},{"name":"Direccion", "type":"type", "unique":false, "nullable":true, "display":true},{"name":"usuario", "type":"type", "unique":true, "nullable":false, "display":true},{"name":"password", "type":"type", "unique":false, "nullable":false, "display":true} ], "comments":"", "key":-5, "loc":"146.70703125 -370.5668380737305", "group":-4},
+{"category":"List", "name":"Usuarios en el sistema", "class":"Usuarios", "fields":[ {"name":"nombre", "type":"type", "unique":false, "nullable":false, "display":true},{"name":"apellido", "type":"type", "unique":false, "nullable":false, "display":true},{"name":"DNI", "type":"type", "unique":true, "nullable":true, "display":false},{"name":"Direccion", "type":"type", "unique":false, "nullable":true, "display":false},{"name":"usuario", "type":"type", "unique":true, "nullable":false, "display":true},{"name":"password", "type":"type", "unique":false, "nullable":false, "display":false} ], "comments":"", "key":-6, "loc":"156.70703125 -180.56683807373048", "group":-4, "detail":true, "edit":true, "delete":true},
+{"name":"Pagina de facturacion", "isGroup":true, "category":"Page", "key":-7},
+{"category":"Script", "name":"greetings.js", "text":"function hello(){console.log(\"hello!\");} hello();", "key":-3, "group":-1},
+{"category":"Form", "name":"Facturar", "class":"Factura", "fields":[ {"name":"lineas", "type":"type", "unique":false, "nullable":false, "display":true},{"name":"total", "type":"type", "unique":false, "nullable":false, "display":true},{"name":"usuario", "type":"type", "unique":false, "nullable":false, "display":true},{"name":"fecha", "type":"type", "unique":false, "nullable":false, "display":true} ], "comments":"", "key":-8, "loc":"173.02740478515625 73.43316192626953", "group":-7},
+{"category":"List", "name":"Facturas", "class":"Factura", "fields":[ {"name":"lineas", "type":"type", "unique":false, "nullable":false, "display":false},{"name":"total", "type":"type", "unique":false, "nullable":false, "display":true},{"name":"usuario", "type":"type", "unique":false, "nullable":false, "display":true},{"name":"fecha", "type":"type", "unique":false, "nullable":false, "display":true} ], "comments":"", "key":-9, "loc":"205.22900390625 230", "group":-7, "detail":true, "edit":true, "delete":true},
+{"name":"Pagina de los libros", "isGroup":true, "category":"Page", "key":-10},
+{"category":"Form", "name":"Agregar un libro", "class":"Libros", "fields":[ {"name":"nombre", "type":"type", "unique":false, "nullable":false, "display":true},{"name":"autor", "type":"type", "unique":false, "nullable":false, "display":true},{"name":"paginas", "type":"type", "unique":false, "nullable":true, "display":true},{"name":"editorial", "type":"type", "unique":false, "nullable":true, "display":true},{"name":"detalle", "type":"type", "unique":false, "nullable":true, "display":true} ], "comments":"", "key":-11, "loc":"-347.7734375 201.97207794189455", "group":-10},
+{"category":"List", "name":"Libros", "class":"Libros", "fields":[ {"name":"nombre", "type":"type", "unique":false, "nullable":false, "display":true},{"name":"autor", "type":"type", "unique":false, "nullable":false, "display":true},{"name":"paginas", "type":"type", "unique":false, "nullable":true, "display":true},{"name":"editorial", "type":"type", "unique":false, "nullable":true, "display":true},{"name":"detalle", "type":"type", "unique":false, "nullable":true, "display":true} ], "comments":"", "key":-12, "loc":"-187.7734375 211.97207794189455", "group":-10, "detail":true, "edit":true, "delete":true}
+ ],
+  "linkDataArray": [ 
+{"from":-1, "to":-4, "points":[-243.95990753173828,-96.01599095662434,-233.95990753173828,-96.01599095662434,-104.01886978149415,-96.01599095662434,-104.01886978149415,-283.96066131591795,40,-283.96066131591795,50,-283.96066131591795], "details":"Usuarios"},
+{"from":-4, "to":-1, "points":[50,-283.96066131591795,40,-283.96066131591795,-104.01886978149415,-283.96066131591795,-104.01886978149415,-96.01599095662434,-233.95990753173828,-96.01599095662434,-243.95990753173828,-96.01599095662434], "details":"Home"},
+{"from":-1, "to":-7, "points":[-243.95990753173828,-96.01599095662434,-233.95990753173828,-96.01599095662434,-236,-96.01599095662434,-236,-96.01599095662434,4,-96.01599095662434,4,143.3227577209473,100,143.3227577209473,110,143.3227577209473], "details":"Facturas"},
+{"from":-7, "to":-1, "points":[110,143.3227577209473,100,143.3227577209473,100,143.3227577209473,100,143.3227577209473,36,143.3227577209473,36,-96.01599095662434,-233.95990753173828,-96.01599095662434,-243.95990753173828,-96.01599095662434], "details":"Home"},
+{"from":-10, "to":-1, "points":[-261.272216796875,92.67343750000003,-261.272216796875,82.67343750000003,-261.272216796875,70.28384170532229,-340,70.28384170532229,-340,71.97207794189455,-340,61.972077941894554], "details":"Home"},
+{"from":-1, "to":-10, "points":[-340,61.972077941894554,-340,71.97207794189455,-340,70.28384170532229,-261.272216796875,70.28384170532229,-261.272216796875,82.67343750000003,-261.272216796875,92.67343750000003], "details":"Libros"}
+ ]}

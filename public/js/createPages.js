@@ -179,7 +179,7 @@ function createDetailPage(jsonList){
 
 	for( var fieldIndex = 0; fieldIndex < jsonList.fields.length; fieldIndex++ ){ // for item in list
 		var inputTemplate = 
-		"		p #{name}: record.#{fieldName}" + '\n';
+		"		p #{name}: #{record.#{fieldName}}" + '\n';
 
 		var inputValues = { name: jsonList.fields[fieldIndex].name , fieldName: jsonList.fields[fieldIndex].name.split(" ").join("_") };
 		var input = $.tmpl(inputTemplate, inputValues);

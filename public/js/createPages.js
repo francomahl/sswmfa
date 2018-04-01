@@ -109,15 +109,11 @@ function createEditPage(jsonList){
 		var fieldType = jsonList.fields[fieldIndex].type.toLowerCase();
 		var inputType = '';
 
-		//----- Update when multiple types are supported -----
-		/*switch(true) {
-			case fieldType.includes('bool'):
-					inputType = 'checkbox';
-					break;
-			case fieldType.includes("int") || fieldType.includes("float"):
+		switch(true) {
+			case fieldType == "integer" || fieldType == "number":
 					inputType = 'number';
 					break;
-			case fieldType.includes("date"):
+			case fieldType == "date":
 					inputType = 'date';
 					break;
 			case fieldType == "password":
@@ -126,30 +122,29 @@ function createEditPage(jsonList){
 			case fieldType == "email":
 					inputType = 'email';
 					break;
+			case fieldType == "textarea":
+					inputType = 'textarea';
+					break;						
+			case fieldType == "tel" || fieldType == "phone":
+					inputType = 'tel';
+					break;						
 			default:
 					inputType = 'text';
 		} // end switch
-		if (inputType == 'checkbox'){*/ 
-		inputType = 'text';
-		if (false){
-		//----- Update when multiple types are supported -----
-
-			var inputTemplate = 
-			"			.form-check" + '\n' +
-			"				label.form-check-label" + '\n' +
-			"				input.form-check-input(id='#{fieldName}', name='#{fieldName}', type='#{inputType}', value=record.#{fieldName})" + '\n' +
-			"				| #{name}" + '\n';
-		} else {
-			var inputTemplate = "			.form-group" + '\n';
-			if ( !jsonList.fields[fieldIndex].nullable ){ //if not nullable then add * and set input as required
-				inputTemplate += 
-					"				label #{name} *" + '\n' +
-					"				input.form-control(id='#{fieldName}', name='#{fieldName}', type='#{inputType}', value=record.#{fieldName}, required='')" + '\n';
+		var inputTemplate = "			.form-group" + '\n';
+		if ( !jsonList.fields[fieldIndex].nullable ){ //if not nullable then add * and set input as required
+			inputTemplate +=	"				label #{name} *" + '\n';
+			if (inputType=='textarea'){
+				inputTemplate += "				textarea.form-control(id='#{fieldName}', name='#{fieldName}', value=record.#{fieldName}, required='')" + '\n';
+			}	else {
+				inputTemplate += "				input.form-control(id='#{fieldName}', name='#{fieldName}', type='#{inputType}', value=record.#{fieldName}, required='')" + '\n';
 			}
-			else { 
-				inputTemplate += 
-					"				label #{name}" + '\n' +
-					"				input.form-control(id='#{fieldName}', name='#{fieldName}', type='#{inputType}', value=record.#{fieldName})" + '\n';
+		}	else {
+			inputTemplate += "				label #{name}" + '\n';
+			if (inputType=='textarea'){
+				inputTemplate += "				textarea.form-control(id='#{fieldName}', name='#{fieldName}') #{record.#{fieldName}}" + '\n';
+			} else {
+				inputTemplate += "				input.form-control(id='#{fieldName}', name='#{fieldName}', type='#{inputType}', value=record.#{fieldName})" + '\n';
 			}
 		}
 		var inputValues = { name: jsonList.fields[fieldIndex].name , fieldName: jsonList.fields[fieldIndex].name.split(" ").join("_") ,inputType: inputType };
@@ -164,7 +159,8 @@ function createEditPage(jsonList){
 		"				input.form-control(id='id', name='id', type='hidden', value=record.id)" + '\n' +
 							"#{elements}" + '\n' +
 		"			.form-group" + '\n' +
-		"				button.btn.btn-primary(type='submit') Update";
+		"				button.btn.btn-primary(type='submit') Update"  + '\n' +
+		"				button.btn.btn-primary.margin-btn(type='reset') Reset" + '\n';
 
 	var formValues = { name: jsonList.name, elements: elements, formClass: jsonList.class.split(" ").join("_") };
 	var formCode = $.tmpl(formTemplate, formValues);

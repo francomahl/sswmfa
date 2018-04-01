@@ -7,15 +7,11 @@ function parseForm(jsonForm){
 		var inputType = '';
 
 		if ( jsonForm.fields[fieldIndex].display || !jsonForm.fields[fieldIndex].nullable ){ // if displayable or unique or not nullabe then shown in form
-			//----- Update when multiple types are supported -----
-			/*switch(true) {
-				case fieldType.includes('bool'):
-						inputType = 'checkbox';
-						break;
-				case fieldType.includes("int") || fieldType.includes("float"):
+			switch(true) {
+				case fieldType == "integer" || fieldType == "number":
 						inputType = 'number';
 						break;
-				case fieldType.includes("date"):
+				case fieldType == "date":
 						inputType = 'date';
 						break;
 				case fieldType == "password":
@@ -24,28 +20,30 @@ function parseForm(jsonForm){
 				case fieldType == "email":
 						inputType = 'email';
 						break;
+				case fieldType == "textarea":
+						inputType = 'textarea';
+						break;						
+				case fieldType == "tel" || fieldType == "phone":
+						inputType = 'tel';
+						break;						
 				default:
 						inputType = 'text';
 			} // end switch
-			if (inputType == 'checkbox'){*/ 
-			inputType = 'text';
-			if (false){
-			//----- Update when multiple types are supported -----
-				 var inputTemplate = "			.form-check" + '\n' +
-														 "				label.form-check-label" + '\n' +
-														 "				input.form-check-input(type='#{inputType}')" + '\n' +
-														 "				|	#{name}" + '\n';
-			} else {
-				var inputTemplate = "			.form-group" + '\n';
-				if ( !jsonForm.fields[fieldIndex].nullable ){ //if not nullable then add * and set input as required
-					inputTemplate += 
-						"				label #{name} *" + '\n' +
-						"				input.form-control(id='#{fieldName}', name='#{fieldName}',type='#{inputType}', required='')" + '\n';
+			var inputTemplate = "			.form-group" + '\n';
+			if ( !jsonForm.fields[fieldIndex].nullable ){ //if not nullable then add * and set input as required
+				inputTemplate += "				label #{name} *" + '\n';
+				if (inputType=='textarea'){
+					inputTemplate += "				textarea.form-control(id='#{fieldName}', name='#{fieldName}', required='')"+ '\n';
+				}	else {
+					inputTemplate += "				input.form-control(id='#{fieldName}', name='#{fieldName}',type='#{inputType}', required='')" + '\n';
 				}
-				else { 
-					inputTemplate += 
-						"				label #{name}" + '\n' +
-						"				input.form-control(id='#{fieldName}', name='#{fieldName}',type='#{inputType}')" + '\n';
+			}	else { 
+				inputTemplate += 
+					"				label #{name}" + '\n';
+				if (inputType=='textarea'){
+					inputTemplate += "				textarea.form-control(id='#{fieldName}', name='#{fieldName}')"+ '\n';
+				} else {
+					inputTemplate += "				input.form-control(id='#{fieldName}', name='#{fieldName}',type='#{inputType}')" + '\n';
 				}
 			}
 			var inputValues = { name: jsonForm.fields[fieldIndex].name , fieldName: jsonForm.fields[fieldIndex].name.split(" ").join("_") ,inputType: inputType };
@@ -58,7 +56,8 @@ function parseForm(jsonForm){
 										 '		form(id="form#{formClass}", action="/render/insertOneIn#{formClass}", method="POST")' + '\n' +
 										 '#{elements}' + '\n' +
 										 "			.form-group" + '\n' +
-										 "				button.btn.btn-primary(type='submit') Submit" + '\n';
+										 "				button.btn.btn-primary(type='submit') Submit" + '\n' +
+										 "				button.btn.btn-primary.margin-btn(type='reset') Reset" + '\n';
 	var formValues = { name: jsonForm.name, elements: elements, formClass: jsonForm.class.split(" ").join("_") };
 	var formCode = $.tmpl(formTemplate, formValues);
 

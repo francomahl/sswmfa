@@ -56,15 +56,24 @@ function createQueries(dbName){
 	  dbName+".createTable"+ (classIndex+1) +" = function(callback){"+ '\n' +
     '	db.run("DROP TABLE IF EXISTS ' + erClasses[classIndex].name.split(" ").join("_") + '", function(err) {'+ '\n' +
     '		db.run("CREATE TABLE IF NOT EXISTS ' + erClasses[classIndex].name.split(" ").join("_") + ' (id INTEGER PRIMARY KEY AUTOINCREMENT,';
+
     for ( var classFieldI = 0; classFieldI < erClasses[classIndex].properties.length; classFieldI++ ){
+      var fieldName = erClasses[classIndex].properties[classFieldI].name.split(" ").join("_");
+      var fieldType = erClasses[classIndex].properties[classFieldI].type.toLowerCase();
+      var dataType = 'TEXT'; //Type TEXT by default
+
+      if (fieldType == "integer" || fieldType == "number") {
+        dataType = 'INTEGER';
+      }
+
       if (erClasses[classIndex].properties[classFieldI].nullable){
-        dbQueries += ' ' +  erClasses[classIndex].properties[classFieldI].name.split(" ").join("_") + ' TEXT,';
+        dbQueries += ' ' + fieldName + ' ' + dataType + ',';
       } else {
-        dbQueries += ' ' +  erClasses[classIndex].properties[classFieldI].name.split(" ").join("_") + ' TEXT NOT NULL,';
+        dbQueries += ' ' + fieldName + ' ' + dataType + ' NOT NULL,';
       };
       if (erClasses[classIndex].properties[classFieldI].unique){
         uniquesCount ++;
-        uniques += erClasses[classIndex].properties[classFieldI].name.split(" ").join("_") + ', ';
+        uniques += fieldName + ', ';
       };
     };
     //Remove last comma from dbQueries

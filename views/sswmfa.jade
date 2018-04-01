@@ -42,10 +42,10 @@ html(lang='en')
               #erDiagramDiv.pdDiv
           div
             div
-              button.btn.btn-secondary#SaveERButton(onclick='saveER()') Convert to JSON
-              button.btn.btn-secondary(onclick='loadER()') Load JSON
-              button.btn.btn-primary(onclick='createDB()') Create DB
-              button(disabled="disabled").btn.btn-primary#createTableButton(onclick='createTables()') Create Tables
+              button.btn.btn-secondary.main-btn#SaveERButton(onclick='saveER()') Convert to JSON
+              button.btn.btn-secondary.main-btn(onclick='loadER()') Load JSON
+              button.btn.btn-primary.main-btn(onclick='createDB()') Create DB
+              button(disabled="disabled").btn.btn-primary.main-btn#createTableButton(onclick='createTables()') Create Tables
               p Diagram Model in JSON format:
             textarea#mySavedERModel.mySavedModel
               | { "class": "go.GraphLinksModel",
@@ -66,11 +66,11 @@ html(lang='en')
               #myInfo
           div
             div
-              button.btn.btn-secondary#SaveNavButton(onclick='saveNav()') Convert to JSON
-              button.btn.btn-secondary(onclick='loadNav()') Load JSON
-              button(disabled="disabled").btn.btn-primary#CreateRoutesButton(onclick='createRoutes()') Create Routes
-              button(disabled="disabled").btn.btn-primary#PagesButton(onclick='createPages()') Create Pages
-              button(disabled="disabled").btn.btn-primary#PlayButton(onclick='play()') Play
+              button.btn.btn-secondary.main-btn#SaveNavButton(onclick='saveNav()') Convert to JSON
+              button.btn.btn-secondary.main-btn(onclick='loadNav()') Load JSON
+              button(disabled="disabled").btn.btn-primary.main-btn#CreateRoutesButton(onclick='createRoutes()') Create Routes
+              button(disabled="disabled").btn.btn-primary.main-btn#PagesButton(onclick='createPages()') Create Pages
+              button(disabled="disabled").btn.btn-primary.main-btn#PlayButton(onclick='play()') Play
               p Diagram Model in JSON format:
             textarea#mySavedNavModel.mySavedModel
               |  { "class": "go.GraphLinksModel",

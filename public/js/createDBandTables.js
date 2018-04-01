@@ -3,6 +3,7 @@ function createDB(){
   var queries = "";
   //call save()
   saveER();
+  createRouterForTables(); //Creates router with endpoint for calling /createTable# functions
   queries = createQueries(dbName);
 
   //Create DB file
@@ -29,9 +30,12 @@ function createTables(){
     success: function(data) {
       console.log('tables created');
       $('#CreateRoutesButton').prop('disabled', false);
-      $('#createTableButton').prop('disabled', true);
+      $('#PagesButton').prop('disabled', true);
+      $('#PlayButton').prop('disabled', true);
     }
   });
+
+
 }
 
 function createQueries(dbName){
@@ -40,18 +44,18 @@ function createQueries(dbName){
     return dbQueries
   }; // if there are no classes then exit
 
-  dbQueries = 
+  dbQueries = '';
   //create tables function
-  dbName+".createTables = function()"+ '\n' +
-  "{"+ '\n';
+
 
   for ( var classIndex = 0; classIndex < erClasses.length; classIndex++ ){
     var uniquesCount = 0;
     var iLastComma = 0;
     var uniques = ', UNIQUE (id,';
     dbQueries +=
-    ' db.run("DROP TABLE IF EXISTS ' + erClasses[classIndex].name.split(" ").join("_") + ' ");'+ '\n' +
-    ' db.run("CREATE TABLE IF NOT EXISTS ' + erClasses[classIndex].name.split(" ").join("_") + ' (id INTEGER PRIMARY KEY AUTOINCREMENT,';
+	  dbName+".createTable"+ (classIndex+1) +" = function(callback){"+ '\n' +
+    '	db.run("DROP TABLE IF EXISTS ' + erClasses[classIndex].name.split(" ").join("_") + '", function(err) {'+ '\n' +
+    '		db.run("CREATE TABLE IF NOT EXISTS ' + erClasses[classIndex].name.split(" ").join("_") + ' (id INTEGER PRIMARY KEY AUTOINCREMENT,';
     for ( var classFieldI = 0; classFieldI < erClasses[classIndex].properties.length; classFieldI++ ){
       if (erClasses[classIndex].properties[classFieldI].nullable){
         dbQueries += ' ' +  erClasses[classIndex].properties[classFieldI].name.split(" ").join("_") + ' TEXT,';
@@ -71,15 +75,18 @@ function createQueries(dbName){
       //Remove last comma from uniques
       iLastComma = uniques.lastIndexOf(',');
       uniques = uniques.slice(0, iLastComma) + uniques.slice(iLastComma).replace(',', '');
-      dbQueries += uniques + '))");' + '\n';
+      dbQueries += uniques + '))';
     } else {
-      dbQueries += ')");' + '\n'; 
+      dbQueries += ')'; 
     }
-  };
-  dbQueries += '}' + '\n'+ '\n';
+    dbQueries += '", function(err) {'+ '\n' + 
+    "			callback(null);"+ '\n' + 
+    '		});' + '\n' + 
+    '	});' + '\n' + 
+    '}' + '\n' +'\n';
+  }//end for each class
 
   //CRUDs
-
   for ( var classCrudIndex = 0; classCrudIndex < erClasses.length; classCrudIndex++ ){
     var iLastComma = 0;
     var className = erClasses[classCrudIndex].name.split(" ").join("_");
@@ -144,4 +151,31 @@ function createQueries(dbName){
   };
 
   return dbQueries;
+}
+
+function createRouterForTables(){
+  const dbName = "SDB";
+
+  var routerForTablesContent = 
+	"var express = require('express');" + '\n' +
+	"var router = express.Router();" + '\n' +
+	"var "+dbName+" = require('../models/db');" + '\n' + '\n'+
+	'router.get("/createTables", function(req, res){' + '\n';
+
+	for ( var classRouteIndex = 0; classRouteIndex < erClasses.length; classRouteIndex++ ){
+		routerForTablesContent +=
+		"\t"+dbName+".createTable" + (classRouteIndex + 1) + "( function(error) {" + '\n' +
+		"		console.log('Table " + erClasses[classRouteIndex].name.split(" ").join("_") + " created');" + '\n' + '\t';
+	}
+	routerForTablesContent += "						res.redirect('back');" +'\n';
+
+	//This should be recursive instead of 2 fors
+	for ( var classRouteIndex = 0; classRouteIndex < erClasses.length; classRouteIndex++ ){
+		routerForTablesContent += "	});" + '\n';
+	}
+	routerForTablesContent += 
+		"});" + '\n'+ '\n' +
+		"module.exports = router;"+ '\n';
+	createFile(routerForTablesContent, "render.js", '../routes/', "script" );
+
 }

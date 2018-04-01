@@ -66,15 +66,6 @@ function createRoutes(){
     routes += route;
   }// end for create routes per page
 
-  var createTablesRouteTemp = 
-    'router.get("/createTables", function(req, res){'+ '\n' +
-    " #{dbName}.createTables();"+ '\n' +
-    " res.end();"+ '\n' +
-    "});"+ '\n'+ '\n';
-  var createTablesRouteVals = { dbName: dbName };
-  var createTablesRoutes = $.tmpl(createTablesRouteTemp, createTablesRouteVals);
-  routes += createTablesRoutes;
-
   //Routers for CRUDs
   if (erClasses.length > 0) {
     for ( var crudRouteIndex = 0; crudRouteIndex < erClasses.length; crudRouteIndex++ ){

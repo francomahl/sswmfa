@@ -8,71 +8,71 @@ function createPages(){
 			scripts = [];
 
 	//Divide nodes by category
-	for ( var nodeToCategorize = 0; nodeToCategorize < navNodes.length; nodeToCategorize++){
-			if ( navNodes[nodeToCategorize].category == "MainPage" || navNodes[nodeToCategorize].category == "Page" ){
-				pages.push(navNodes[nodeToCategorize]);
-			} else if ( navNodes[nodeToCategorize].category == "Form" ){
-				forms.push(navNodes[nodeToCategorize]);
-			} else if ( navNodes[nodeToCategorize].category == "List"){
-				lists.push(navNodes[nodeToCategorize]);
-			} else if ( navNodes[nodeToCategorize].category == "Script"){
-				scripts.push(navNodes[nodeToCategorize]);
+  navNodes.forEach(function (navNode, index){	
+			if ( navNode.category == "MainPage" || navNode.category == "Page" ){
+				pages.push(navNode);
+			} else if ( navNode.category == "Form" ){
+				forms.push(navNode);
+			} else if ( navNode.category == "List"){
+				lists.push(navNode);
+			} else if ( navNode.category == "Script"){
+				scripts.push(navNode);
 			}
-	}
+	});
 
 	//Iterate over pages
-	for ( var pageInProcess = 0; pageInProcess < pages.length; pageInProcess++ ){
+  pages.forEach(function (page, pIndex){	
 		var pageForms = '',
 				pageLists = '',
 				pageLinks = '',
 				content =	'',
 				importScripts = 'block append scripts' + '\n';
 
-		for ( var formInProcess = 0; formInProcess < forms.length; formInProcess++ ){
+    forms.forEach(function (form, index){
 			//parse forms within group
-			if( forms[formInProcess].group == pages[pageInProcess].key ){
-				pageForms = pageForms + parseForm(forms[formInProcess]) + '\n';
+			if( form.group == page.key ){
+				pageForms = pageForms + parseForm(form) + '\n';
 			}
-		}
+		})
 
-		for ( var listInProcess = 0; listInProcess < lists.length; listInProcess++ ){
+    lists.forEach(function (list, index){
 			//parse lists within group
-			if ( lists[listInProcess].group == pages[pageInProcess].key ){
-				pageLists = pageLists + parseList(lists[listInProcess]) + '\n';
-				if ( lists[listInProcess].edit ){
-					createEditPage(lists[listInProcess]);
+			if ( list.group == page.key ){
+				pageLists = pageLists + parseList(list) + '\n';
+				if ( list.edit ){
+					createEditPage(list);
 				}
-				if ( lists[listInProcess].detail ){
-					createDetailPage(lists[listInProcess]);
+				if ( list.detail ){
+					createDetailPage(list);
 				}
 			}
-		};
+		});
 
-		for( var linkInProcess = 0; linkInProcess < navLinks.length; linkInProcess++ ){
+    navLinks.forEach(function (navLink, index){  
 			//parse links within group
-			if(navLinks[linkInProcess].from == pages[pageInProcess].key ){
-				pageLinks = pageLinks + parseLink(navLinks[linkInProcess], pages) + '\n';
+			if(navLink.from == page.key ){
+				pageLinks = pageLinks + parseLink(navLink, pages) + '\n';
 			}
-		};
+		});
 
-		for ( var scriptInProcess = 0; scriptInProcess < scripts.length; scriptInProcess++ ){
+    scripts.forEach(function (script, index){
 			//parse lists within group
-			 if ( scripts[scriptInProcess].group == pages[pageInProcess].key ){
-				createFile(scripts[scriptInProcess].text, scripts[scriptInProcess].name, '../public/rendered/', "script" );
-				importScripts = importScripts + "	script(src='../../src/rendered/"+scripts[scriptInProcess].name+"')" + '\n';
+			 if ( script.group == page.key ){
+				createFile(script.text, script.name, '../public/rendered/', "script" );
+				importScripts = importScripts + `	script(src='../../src/rendered/${script.name}')` + '\n';
 			}
-		};	
+		});	
 
 		content = pageForms + pageLists;
 
 		//Create jade file
-		var fileHeader = "extends ../layout" + '\n';
+		let fileHeader = "extends ../layout" + '\n';
 
 		if (scripts.length > 0) {
 			fileHeader += importScripts;
 		};
 
-		var fileContent =
+		const fileContent =
 		 "block content" + '\n' +
 		 "	.col-sm-2" + '\n' +
 		 "		nav.nav.flex-column" + '\n' +
@@ -80,22 +80,21 @@ function createPages(){
 		 "	.col-sm-10" + '\n'+
 		 			"#{content}" + '\n';
 
-		var fileTemplate = fileHeader + fileContent;
-		var myValues = { content: content, pageLinks: pageLinks };
-		var jadeCode = $.tmpl(fileTemplate, myValues);
-		var fileName = pages[pageInProcess].name;
-		fileName = fileName.toLowerCase().split(" ").join("_");
-		fileNameToSaveAs = fileName + ".jade"
+		const fileTemplate = fileHeader + fileContent;
+		const myValues = { content: content, pageLinks: pageLinks };
+		const jadeCode = $.tmpl(fileTemplate, myValues);
+		const fileName = page.name.toLowerCase().split(" ").join("_");
+		const fileNameToSaveAs = fileName + ".jade"
 
 		//call function to create jade file
 		createFile(jadeCode, fileNameToSaveAs,'../views/rendered/', "jade");
-	} // end for each page
+	}); // end for each page
 	$('#PlayButton').prop('disabled', false); //Enable step 3
 } // end createPages()
 
 function createEditPage(jsonList){
 
-	var formTemplate =
+	let formTemplate =
 		"extends ../layout" + '\n' +
 		"block content" + '\n' +
 		"	.col-sm-2" + '\n' +
@@ -103,54 +102,59 @@ function createEditPage(jsonList){
 		"			a.nav-link(href='/render/') Volver al inicio" + '\n' +
 		"	.col-sm-10" + '\n';
 
-	var elements = '';
+	let elements = '';
 
-	for( var fieldIndex = 0; fieldIndex < jsonList.fields.length; fieldIndex++ ){ // for item in list
-		var fieldType = jsonList.fields[fieldIndex].type.toLowerCase();
-		var inputType = '';
+  jsonList.fields.forEach(function (field, index){  
+		const fieldType = field.type.toLowerCase();
+		let inputType = '';
 
-		switch(true) {
-			case fieldType == "integer" || fieldType == "number":
-					inputType = 'number';
-					break;
-			case fieldType == "date":
-					inputType = 'date';
-					break;
-			case fieldType == "password":
-					inputType = 'password';
-					break;
-			case fieldType == "email":
-					inputType = 'email';
-					break;
-			case fieldType == "textarea":
-					inputType = 'textarea';
-					break;						
-			case fieldType == "tel" || fieldType == "phone":
-					inputType = 'tel';
-					break;						
-			default:
-					inputType = 'text';
+    switch(fieldType) {
+      case "integer": 
+      case "number":
+      case "bigint":
+          inputType = 'number';
+          break;
+      case "date":
+      case "datetime":
+          inputType = 'date';
+          break;
+      case "password":
+          inputType = 'password';
+          break;
+      case "email":
+          inputType = 'email';
+          break;
+      case "textarea":
+      case "text":
+          inputType = 'textarea';
+          break;						
+      case "tel":
+      case "phone":
+          inputType = 'tel';
+          break;						
+      default:
+          inputType = 'text';
 		} // end switch
-		var inputTemplate = "			.form-group" + '\n';
-		if ( !jsonList.fields[fieldIndex].nullable ){ //if not nullable then add * and set input as required
+		let inputTemplate = "			.form-group" + '\n';
+		if ( !field.nullable ){ //if not nullable then add * and set input as required
 			inputTemplate +=	"				label #{name} *" + '\n';
-			if (inputType=='textarea'){
+			if (inputType === 'textarea'){
 				inputTemplate += "				textarea.form-control(id='#{fieldName}', name='#{fieldName}', value=record.#{fieldName}, required='')" + '\n';
 			}	else {
 				inputTemplate += "				input.form-control(id='#{fieldName}', name='#{fieldName}', type='#{inputType}', value=record.#{fieldName}, required='')" + '\n';
 			}
 		}	else {
 			inputTemplate += "				label #{name}" + '\n';
-			if (inputType=='textarea'){
+			if (inputType === 'textarea'){
 				inputTemplate += "				textarea.form-control(id='#{fieldName}', name='#{fieldName}') #{record.#{fieldName}}" + '\n';
 			} else {
 				inputTemplate += "				input.form-control(id='#{fieldName}', name='#{fieldName}', type='#{inputType}', value=record.#{fieldName})" + '\n';
 			}
 		}
-		var inputValues = { name: jsonList.fields[fieldIndex].name , fieldName: jsonList.fields[fieldIndex].name.split(" ").join("_") ,inputType: inputType };
-		var input = $.tmpl(inputTemplate, inputValues);
+		const inputValues = { name: field.name , fieldName: field.name.split(" ").join("_") ,inputType: inputType };
+		const input = $.tmpl(inputTemplate, inputValues);
 		elements += input;
-	}// end for item in list
+	})// end for item in list
 
 	formTemplate += 
 		"		h3 Update record in #{name}" + '\n' +
@@ -160,29 +164,26 @@ function createEditPage(jsonList){
 							"#{elements}" + '\n' +
 		"			.form-group" + '\n' +
 		"				button.btn.btn-primary(type='submit') Update"  + '\n' +
-		"				button.btn.btn-primary.margin-btn(type='reset') Reset" + '\n';
-
-	var formValues = { name: jsonList.name, elements: elements, formClass: jsonList.class.split(" ").join("_") };
-	var formCode = $.tmpl(formTemplate, formValues);
-	var fileName = "formUpdateOneIn"+jsonList.class.split(" ").join("_");
-	var fileNameToSaveAs = fileName + ".jade";
+    "				button.btn.btn-primary.margin-btn(type='reset') Reset" + '\n';
+    
+  const className = jsonList.class.split(" ").join("_");
+  const formValues = { name: jsonList.name, elements: elements, formClass: className };
+	const formCode = $.tmpl(formTemplate, formValues);
+	const fileName = `formUpdateOneIn${className}.jade`;
 	//call function to create jade file
-	createFile(formCode, fileNameToSaveAs,'../views/rendered/', "jade");
+	createFile(formCode, fileName,'../views/rendered/', "jade");
 }// end createEditPage()
 
 function createDetailPage(jsonList){
-	var elements = '';
+	let elements = '';
 
-	for( var fieldIndex = 0; fieldIndex < jsonList.fields.length; fieldIndex++ ){ // for item in list
-		var inputTemplate = 
-		"		p #{name}: #{record.#{fieldName}}" + '\n';
-
-		var inputValues = { name: jsonList.fields[fieldIndex].name , fieldName: jsonList.fields[fieldIndex].name.split(" ").join("_") };
-		var input = $.tmpl(inputTemplate, inputValues);
+  jsonList.fields.forEach(function (field, index){
+    const fieldName = field.name.split(" ").join("_");
+		const input = `		p ${field.name}: #{record.${fieldName}}` + '\n';
 		elements += input;
-	}// end for item in list
+	});// end for each item in list
 
-	var fileTemplate =
+	const fileTemplate =
 		"extends ../layout" + '\n' +
 		"block content" + '\n' +
 		"	.col-sm-2" + '\n' +
@@ -192,11 +193,11 @@ function createDetailPage(jsonList){
 		"		h3 Detail" + '\n' +
 		"#{elements}" + '\n';
 
-	var myValues = { elements: elements };
-	var jadeCode = $.tmpl(fileTemplate, myValues);
-	var fileName = "detailFrom"+jsonList.class.split(" ").join("_");
-	var fileNameToSaveAs = fileName + ".jade";
+  const className = jsonList.class.split(" ").join("_");
+	const myValues = { elements: elements };
+	const jadeCode = $.tmpl(fileTemplate, myValues);
+	const fileName = `detailFrom${className}.jade`
 
 	//call function to create jade file
-	createFile(jadeCode, fileNameToSaveAs,'../views/rendered/', "jade");
+	createFile(jadeCode, fileName,'../views/rendered/', "jade");
 } //end createDetailPage() 

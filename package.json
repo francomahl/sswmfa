@@ -10,11 +10,14 @@
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
-    "express": "~4.15.5",
+    "express": "~4.16.0",
     "gojs": "^1.8.14",
+    "http-errors": "~1.6.2",
     "jade": "^1.11.0",
     "morgan": "~1.9.0",
-    "serve-favicon": "~2.4.5",
+    "node-pre-gyp": "^0.9.1",
+    "sequelize": "^4.37.6",
+    "serve-favicon": ">=2.4.5",
     "sqlite3": "^4.0.0"
   },
   "devDependencies": {

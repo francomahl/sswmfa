@@ -1,5 +1,4 @@
-var sqlite3 = require('sqlite3').verbose(),
-db = new sqlite3.Database('sswmfa.sql'),
-SDB = {};
+const Sequelize = require('sequelize');
+const sequelize = new Sequelize('sqlite:sswmfa.db');
 
-module.exports = SDB;
+module.exports = sequelize;

@@ -1,20 +1,18 @@
 function createDB(){
-  const dbName = "SDB";
-  var queries = "";
+  var classes = "";
   //call save()
   saveER();
-  createRouterForTables(); //Creates router with endpoint for calling /createTable# functions
-  queries = createQueries(dbName);
+  createRouterForTables(); //Creates router for /createTable endpoint 
+  classes = createClasses();
 
   //Create DB file
   var dbConfigTemplate = 
-  "var sqlite3 = require('sqlite3').verbose(),"+ '\n' +
-  "db = new sqlite3.Database('sswmfa.sql'),"+ '\n' +
-  '#{dbName} = {};'+ '\n' + '\n' +
-  '#{queries}'+ '\n' +
-  'module.exports = #{dbName};' + '\n';
+  "const Sequelize = require('sequelize');"+ '\n' +
+  "const sequelize = new Sequelize('sqlite:sswmfa.db');"+ '\n' + '\n' +
+  '#{classes}' +
+  'module.exports = sequelize;' + '\n';
 
-  var dbConfigValues = { queries: queries, dbName: dbName };
+  var dbConfigValues = { classes: classes };
   var dbConfigContent = $.tmpl(dbConfigTemplate, dbConfigValues);
 
   createFile(dbConfigContent, "db.js", '../models/', "script" );
@@ -34,157 +32,75 @@ function createTables(){
       $('#PlayButton').prop('disabled', true);
     }
   });
-
-
 }
 
-function createQueries(dbName){
-  var dbQueries = "";
+function createClasses(){
+  let dbClasses = '';
   if (erClasses.length < 1) {
-    return dbQueries
-  }; // if there are no classes then exit
+    return dbClasses
+  }; // if there are no classes then return
 
-  dbQueries = '';
-  //create tables function
+  erClasses.forEach(function (erClass, cIndex){
+    const className = erClass.name.split(" ").join("_");
+    dbClasses +=
+    `const ${className} = sequelize.define('${className}', {` + '\n' +
+    " id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true }," + '\n';
+    erClass.properties.forEach(function (property, pIndex){  
+      const fieldName = property.name.split(" ").join("_");
+      const fieldType = property.type.toLowerCase();
+      let dataType = ''; 
 
-
-  for ( var classIndex = 0; classIndex < erClasses.length; classIndex++ ){
-    var uniquesCount = 0;
-    var iLastComma = 0;
-    var uniques = ', UNIQUE (id,';
-    dbQueries +=
-	  dbName+".createTable"+ (classIndex+1) +" = function(callback){"+ '\n' +
-    '	db.run("DROP TABLE IF EXISTS ' + erClasses[classIndex].name.split(" ").join("_") + '", function(err) {'+ '\n' +
-    '		db.run("CREATE TABLE IF NOT EXISTS ' + erClasses[classIndex].name.split(" ").join("_") + ' (id INTEGER PRIMARY KEY AUTOINCREMENT,';
-
-    for ( var classFieldI = 0; classFieldI < erClasses[classIndex].properties.length; classFieldI++ ){
-      var fieldName = erClasses[classIndex].properties[classFieldI].name.split(" ").join("_");
-      var fieldType = erClasses[classIndex].properties[classFieldI].type.toLowerCase();
-      var dataType = 'TEXT'; //Type TEXT by default
-
-      if (fieldType == "integer" || fieldType == "number") {
-        dataType = 'INTEGER';
+      switch(fieldType)
+      {
+        case "integer":
+        case "number":
+          dataType = 'INTEGER';
+          break;
+        case "bigint":
+          dataType = 'BIGINT';
+          break;
+        /*case "float":
+        case "real":
+          dataType = 'FLOAT';
+          break;
+        case "double":
+          dataType = 'DOUBLE';
+          break;*/
+        case "text":
+        case "textarea":
+          dataType = 'TEXT';
+          break;
+        case "date":
+        case "datetime":
+          dataType = 'DATE';
+          break;          
+        default: //Type STRING(255) by default
+          dataType = "STRING";
       }
+      dbClasses +=
+      `  ${fieldName}: { type: Sequelize.${dataType}`;
+      dbClasses += (property.nullable ? '' : ', allowNull: false' );
+      dbClasses += (property.unique ? ', unique: true' : '' );
+      dbClasses += ((pIndex+1 === erClass.properties.length) ? " }" : " }," );
+      dbClasses += '\n';
+    });// end for each field
+    dbClasses += 
+    '});' + '\n' + '\n';
+  });//end for each class
 
-      if (erClasses[classIndex].properties[classFieldI].nullable){
-        dbQueries += ' ' + fieldName + ' ' + dataType + ',';
-      } else {
-        dbQueries += ' ' + fieldName + ' ' + dataType + ' NOT NULL,';
-      };
-      if (erClasses[classIndex].properties[classFieldI].unique){
-        uniquesCount ++;
-        uniques += fieldName + ', ';
-      };
-    };
-    //Remove last comma from dbQueries
-    iLastComma = dbQueries.lastIndexOf(',');
-    dbQueries = dbQueries.slice(0, iLastComma) + dbQueries.slice(iLastComma).replace(',', '');
-    //check if there are unique columns
-    if ( uniquesCount > 0 ){
-      //Remove last comma from uniques
-      iLastComma = uniques.lastIndexOf(',');
-      uniques = uniques.slice(0, iLastComma) + uniques.slice(iLastComma).replace(',', '');
-      dbQueries += uniques + '))';
-    } else {
-      dbQueries += ')'; 
-    }
-    dbQueries += '", function(err) {'+ '\n' + 
-    "			callback(null);"+ '\n' + 
-    '		});' + '\n' + 
-    '	});' + '\n' + 
-    '}' + '\n' +'\n';
-  }//end for each class
-
-  //CRUDs
-  for ( var classCrudIndex = 0; classCrudIndex < erClasses.length; classCrudIndex++ ){
-    var iLastComma = 0;
-    var className = erClasses[classCrudIndex].name.split(" ").join("_");
-    var insertVars = '';
-    var dataFields = '';
-    var updateFields = '';
-    for ( var classFieldI = 0; classFieldI < erClasses[classCrudIndex].properties.length; classFieldI++ ){
-      insertVars += '?, ';
-      dataFields += 'data.' + erClasses[classCrudIndex].properties[classFieldI].name.split(" ").join("_") + ', ';
-      updateFields += erClasses[classCrudIndex].properties[classFieldI].name.split(" ").join("_") + ' = ?, ';
-    }
-    //Remove last comma from insertVars
-    iLastComma = insertVars.lastIndexOf(',');
-    insertVars = insertVars.slice(0, iLastComma) + insertVars.slice(iLastComma).replace(',', '');
-    //Remove last comma from dataFields
-    iLastComma = dataFields.lastIndexOf(',');
-    dataFields = dataFields.slice(0, iLastComma) + dataFields.slice(iLastComma).replace(',', '');
-    //Remove last comma from updateFields
-    iLastComma = updateFields.lastIndexOf(',');
-    updateFields = updateFields.slice(0, iLastComma) + updateFields.slice(iLastComma).replace(',', '');
-
-    dbQueries +=
-    dbName+".insertOneIn"+className+" = function(data){"+ '\n'+
-    '  var stmt = db.prepare("INSERT INTO '+className+ ' VALUES (?, ' + insertVars + ')");'+ '\n'+
-    '  stmt.run(null, '+dataFields+');'+ '\n'+
-    '  stmt.finalize();}'+ '\n'+ '\n';
-
-    dbQueries +=
-    dbName+".updateOneIn"+className+" = function(data){"+ '\n'+
-    '  var stmt = db.prepare("UPDATE '+className+' SET '+updateFields+'WHERE id = ? ");'+ '\n'+
-    '  stmt.run('+dataFields+', data.id);'+ '\n'+
-    '  stmt.finalize();}'+ '\n'+ '\n';
-
-    dbQueries +=
-    dbName+".getAllFrom"+className+" = function(callback){"+ '\n'+
-     'db.all("SELECT * FROM '+className+'", function(err, rows) {'+ '\n'+
-     "if(err) {throw err;}"+ '\n'+
-     "else { callback(null, rows);}"+ '\n'+
-     "});}"+ '\n'+ '\n';
-
-     dbQueries +=
-     dbName+".getOneFrom"+className+" = function(id,callback){" +'\n'+
-     '  stmt = db.prepare("SELECT * FROM '+className+' WHERE id = ?");' +'\n'+
-     '  stmt.bind(id); ' +'\n'+
-     '  stmt.get(function(error, row){' +'\n'+
-     '    if(error) { throw err; }' +'\n'+
-     '      else {' +'\n'+
-     '          if(row)' +'\n'+
-     '          { callback("", row); }' +'\n'+
-     '          else' +'\n'+
-     '          { callback("Record not found", null) }}' +'\n'+
-     '  });}'+ '\n'+ '\n';
-
-     dbQueries +=
-     dbName+".deleteOneFrom"+className+" = function(id,callback){" +'\n'+
-     '  stmt = db.prepare("DELETE FROM '+className+' WHERE id = ?");' +'\n'+
-     '  stmt.bind(id);' +'\n'+
-     '  stmt.get(function(error, row){' +'\n'+
-     '    if(error) { throw err; } ' +'\n'+
-     '    else { console.log("Record deleted"); }' +'\n'+
-     '  });}'+ '\n'+ '\n';
-  };
-
-  return dbQueries;
+  return dbClasses;
 }
 
 function createRouterForTables(){
-  const dbName = "SDB";
+  const routerForTablesContent = 
+  "var express = require('express');" + '\n' +
+  "var router = express.Router();" + '\n' +
+  "var sequelize = require('../models/db');" + '\n' + '\n' +
+  "router.get('/createTables', function(req, res){" + '\n' +
+  "  sequelize.sync({force: true});" + '\n' +
+  "  res.redirect('back');" + '\n' +
+  "});" + '\n' + '\n' +
+  "module.exports = router;" + '\n';
 
-  var routerForTablesContent = 
-	"var express = require('express');" + '\n' +
-	"var router = express.Router();" + '\n' +
-	"var "+dbName+" = require('../models/db');" + '\n' + '\n'+
-	'router.get("/createTables", function(req, res){' + '\n';
-
-	for ( var classRouteIndex = 0; classRouteIndex < erClasses.length; classRouteIndex++ ){
-		routerForTablesContent +=
-		"\t"+dbName+".createTable" + (classRouteIndex + 1) + "( function(error) {" + '\n' +
-		"		console.log('Table " + erClasses[classRouteIndex].name.split(" ").join("_") + " created');" + '\n' + '\t';
-	}
-	routerForTablesContent += "						res.redirect('back');" +'\n';
-
-	//This should be recursive instead of 2 fors
-	for ( var classRouteIndex = 0; classRouteIndex < erClasses.length; classRouteIndex++ ){
-		routerForTablesContent += "	});" + '\n';
-	}
-	routerForTablesContent += 
-		"});" + '\n'+ '\n' +
-		"module.exports = router;"+ '\n';
 	createFile(routerForTablesContent, "render.js", '../routes/', "script" );
-
 }

@@ -15,21 +15,11 @@ Move to the project folder:
 ```bash
 $ cd sswmfa
 ```
-Install dependencies:
+Build and run the Docker container:
 ```bash
-$ sudo apt-get update
-$ sudo apt-get install nodejs
-$ sudo apt-get install npm
-$ npm install
+$ docker build -t sswmfa .
+$ docker run -p 3000:3000 sswmfa
 ```
-Create the folders:
-```bash
-$ mkdir /public/rendered
-$ mkdir /views/rendered
-```
-
-Run the project `$ DEBUG=sswmfa:* npm run devstart`
-
 Go to *http://localhost:3000/*
 
 Render: When the model is played it creates the html files into `public/view` and the corresponding

@@ -1,10 +1,11 @@
 # sswmfa
 Server-Side Web Modelling for Augmentations
+
 Developed in NodeJS - Express
 
 Framework for Modelling: GoJS https://gojs.net/
 
-ORM: Sequelizer http://docs.sequelizejs.com/
+ORM: Sequelize http://docs.sequelizejs.com/
 
 ## Installation
 Clone the repo:

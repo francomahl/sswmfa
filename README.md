@@ -7,8 +7,15 @@ Framework for Modelling: GoJS https://gojs.net/
 ORM: Sequelizer http://docs.sequelizejs.com/
 
 ## Installation
-Clone the repo `$ git clone git@github.com:francomahl/sswmfa.git`
-Move to the project folder `$ cd sswmfa`
+Clone the repo:
+```bash
+$ git clone git@github.com:francomahl/sswmfa.git
+```
+Move to the project folder:
+```bash
+$ cd sswmfa
+```
+Install dependencies:
 ```bash
 $ sudo apt-get update
 $ sudo apt-get install nodejs

@@ -1,4 +1,4 @@
-FROM node:carbon
+FROM node:9.10.1
 
 # Create app directory
 WORKDIR /app
@@ -13,6 +13,3 @@ RUN npm install
 
 # Bundle app source
 COPY . .
-
-EXPOSE 3000
-CMD DEBUG=sswmfa:* npm run devstart

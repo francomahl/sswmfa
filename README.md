@@ -16,6 +16,13 @@ Move to the project folder:
 ```bash
 $ cd sswmfa
 ```
+
+Create the folders for the rendered files:
+```bash
+$ mkdir /public/rendered
+$ mkdir /views/rendered
+```
+
 Build and run the Docker container:
 ```bash
 $ docker build -t sswmfa .

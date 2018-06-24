@@ -23,10 +23,9 @@ $ mkdir /public/rendered
 $ mkdir /views/rendered
 ```
 
-Build and run the Docker container:
+Build and run the Docker compose:
 ```bash
-$ docker build -t sswmfa .
-$ docker run -p 3000:3000 sswmfa
+$ docker-compose up --build --force-recreate --remove-orphans
 ```
 Go to *http://localhost:3000/*
 

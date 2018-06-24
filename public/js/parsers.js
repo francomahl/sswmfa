@@ -2,7 +2,6 @@
 function parseForm(jsonForm){
 	let elements = '';
 
-	//for( var fieldIndex = 0; fieldIndex < jsonForm.fields.length; fieldIndex++ ){
   jsonForm.fields.forEach(function (field, index){
 		const fieldType = field.type.toLowerCase();
 		let inputType = '';
@@ -72,16 +71,13 @@ function parseForm(jsonForm){
 
 //Parser for Lists - from JSON to HTML
 function parseList(jsonList){
-	let headers = '';
-	let details = '';
+	let headers = "					th(scope='col') id" + '\n';
+	let details =  "							td=item.id" + '\n';
 
-	//for( var listItem = 0; listItem < jsonList.fields.length; listItem++ ){
   jsonList.fields.forEach(function (field, index){
 		if (field.display){
 			//table headers
-			const headerTemplate = "					th(scope='col') #{name}" + '\n';
-			const headerValues = { name: field.name };
-			const header = $.tmpl(headerTemplate, headerValues);
+			const header = `					th(scope='col') ${field.name}` + '\n';
 			headers += header;
 			//table details
 			const detailTemplate = "							td=item.#{name}" + '\n';
@@ -127,7 +123,6 @@ function parseLink(jsonLink, pages){
 	let linkToPage = 'home';
 	let url = '/render/';
 
-	//for( var link = 0; link < pages.length; link++ ){
   pages.forEach(function (page, index){
 		if( jsonLink.to === page.key ){
 			if(page.category === "MainPage"){

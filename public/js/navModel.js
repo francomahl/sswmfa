@@ -174,16 +174,22 @@ function initNav() {
   function commonNodePanels() {
     return[
       { defaultRowSeparatorStroke: "black"},
-      // header
-      GO(go.TextBlock,
-        {
-          row: 0, columnSpan: 2, margin: 3, alignment: go.Spot.Center,
-          font: "bold 12pt sans-serif",
-          isMultiline: false, editable: true
-        },
-      // class  
-      new go.Binding("text", "name").makeTwoWay()
-      ),
+      GO(go.Panel, "Horizontal",
+        GO(go.Shape,
+          { width: 20, height: 12 },
+          new go.Binding("figure"),
+          new go.Binding("fill")
+        ),
+        GO(go.TextBlock,
+          {
+            row: 0, columnSpan: 2, margin: 3, alignment: go.Spot.Center,
+            font: "bold 12pt sans-serif",
+            isMultiline: false, editable: true
+          },
+        // class  
+        new go.Binding("text", "name").makeTwoWay()
+        ),
+    )
     ]
   }
 
@@ -260,10 +266,18 @@ function commonNodeFieldPannels(){
       },
       new go.Binding("fill", "color")),
     GO(go.Panel, "Table",
-      GO(go.TextBlock,
-        { row: 0, isMultiline: false, editable: true, margin: 3, font: "bold 12pt sans-serif" },
-        new go.Binding("text", "name").makeTwoWay()
-      ),    
+
+      GO(go.Panel, "Horizontal",
+        GO(go.Shape,
+          { width: 20, height: 20 },
+          new go.Binding("figure"),
+          new go.Binding("fill")
+        ),
+        GO(go.TextBlock,
+          { row: 0, isMultiline: false, editable: true, margin: 3, font: "bold 12pt sans-serif" },
+          new go.Binding("text", "name").makeTwoWay()
+        )
+      ),   
       GO(go.TextBlock,
         {
           row:1, font: "8pt courier", stroke: '#333',
@@ -273,7 +287,7 @@ function commonNodeFieldPannels(){
         new go.Binding("text", "text").makeTwoWay()
       )
     )
-  ));    
+  ));
 
   // On selection changed, make sure infoDraggable will resize as necessary
   navDiagram.addDiagramListener("ChangedSelection", function(diagramEvent) {
@@ -313,6 +327,9 @@ function commonNodeFieldPannels(){
       )
     );
 
+/*
+BpmnActivitySequential lista; BpmnTaskScript script; BpmnEventConditional Form
+*/
     // initialize the Palette that is on the left side of the page
   navPalette =
     GO(go.Palette, "navPaletteDiv",  // must name or refer to the DIV HTML element
@@ -322,10 +339,31 @@ function commonNodeFieldPannels(){
         groupTemplateMap: navDiagram.groupTemplateMap,
         layout: GO(go.GridLayout, { wrappingColumn: 1, alignment: go.GridLayout.Position }),
         model: new go.GraphLinksModel([  // specify the contents of the Palette
-          { category: "Form", name: "Form", class: "No Class selected", fields: [{ name: "field1", type: "dataType", unique: false, nullable: true, display: true }], comments: ""},
-          { category: "List", name: "List", class: "No Class selected", fields: [{ name: "field1", type: "dataType", unique: false, nullable: true, display: true }], comments: ""},
-          { category: "Script", name: "Script", text: "Insert script here"},
-          { name: "Page", isGroup: true, category:"Page" }
+          { category: "Form",
+            name: "Form",
+            class: "No Class selected",
+            fields: [{ name: "field1", type: "dataType", unique: false, nullable: true, display: true }],
+            comments: "",
+            figure: "BpmnEventConditional",
+            fill: "white"
+          },
+          { category: "List",
+            name: "List",
+            class: "No Class selected",
+            fields: [{ name: "field1", type: "dataType", unique: false, nullable: true, display: true }],
+            comments: "",
+            figure: "BpmnActivitySequential"
+          },
+          { category: "Script",
+            name: "Script",
+            text: "Insert script here",
+            figure: "BpmnTaskScript",
+            fill: "white"
+          },
+          { name: "Page",
+            isGroup: true,
+            category:"Page"
+          }
         ])
       });
 

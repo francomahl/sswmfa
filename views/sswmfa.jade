@@ -29,11 +29,11 @@ html(lang='en')
   body(onload='initER();initNav();')
     ul#myTab.nav.nav-tabs(role='tablist')
       li.nav-item
-        a.nav-link.active(data-toggle='tab', href='#erModel', role='tab') ER
+        a.nav-link(data-toggle='tab', href='#erModel', role='tab') ER
       li.nav-item
-        a.nav-link(data-toggle='tab', href='#navModel', role='tab') Navigation
+        a.nav-link.active(data-toggle='tab', href='#navModel', role='tab') Navigation
     .tab-content
-      #erModel.tab-pane.active(role='tabpanel')
+      #erModel.tab-pane(role='tabpanel')
         #erModelling
           .pdContainer
             span.paletteSpan
@@ -53,7 +53,7 @@ html(lang='en')
               | ],
               | "linkDataArray": [
               | ]}
-      #navModel.tab-pane(role='tabpanel')
+      #navModel.tab-pane.active(role='tabpanel')
         #navModelling
           .pdContainer
             span.paletteSpan

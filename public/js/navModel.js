@@ -24,7 +24,19 @@ function initNav() {
         GO(go.Shape, "Diamond", { desiredSize: new go.Size(7, 7), fill: "lightblue", stroke: "deepskyblue" }),
       "undoManager.isEnabled": true
     });
+    // "icons" is defined in icons.js
 
+    // A data binding conversion function. Given an icon name, return a Geometry.
+    // This assumes that all icons want to be filled.
+    // This caches the Geometry, because the Geometry may be shared by multiple Shapes.
+    function geoFunc(geoname) {
+      var geo = icons[geoname];
+      if (geo === undefined) geo = "heart";  // use this for an unknown icon name
+      if (typeof geo === "string") {
+        geo = icons[geoname] = go.Geometry.parse(geo, true);  // fill each geometry
+      }
+      return geo;
+    }
   // when the document is modified, add a "*" to the "Save" button
   navDiagram.addDiagramListener("Modified", function(e) {
       var button = $("#SaveNavButton");
@@ -68,10 +80,10 @@ function initNav() {
     if (!ok) e.diagram.currentTool.doCancel();
   }
 
-  function commonGroupPanels() {
+  function commonGroupPanels(color) {
     return [
       GO(go.Shape, "Rectangle",
-        { fill: "#EAE6E6", stroke: "#EAE6E6", strokeWidth: 2 }),
+        { fill: color, stroke: color, strokeWidth: 2 }),
       GO(go.Panel, "Vertical",  // title above Placeholder
         { portId: "", cursor: "pointer",  // the Shape is the port, not the whole Node
           // allow all kinds of links from and to this port
@@ -79,7 +91,7 @@ function initNav() {
           toLinkable: true, toLinkableSelfNode: true, toLinkableDuplicates: true
         },
         GO(go.Panel, "Horizontal",  // button next to TextBlock
-          { stretch: go.GraphObject.Horizontal, background: "#EAE6E6" },
+          { stretch: go.GraphObject.Horizontal, background: color },
           GO("SubGraphExpanderButton",
             { alignment: go.Spot.Right, margin: 5 }),
           GO(go.TextBlock,
@@ -87,7 +99,7 @@ function initNav() {
               alignment: go.Spot.Left,
               editable: true,
               margin: 5,
-              font: "bold 16px sans-serif",
+              font: "bold 14pt sans-serif",
               opacity: 0.75,
               stroke: "black"
             },
@@ -112,7 +124,7 @@ function initNav() {
         mouseDrop: finishDrop,
         handlesDragDropForMembers: true  // don't need to define handlers on member Nodes and Links
       },
-      commonGroupPanels(),
+      commonGroupPanels("#C5EDAC"),
     ));  // end Group and call to add to template Map
 
   //Group of nodes - Page
@@ -126,14 +138,14 @@ function initNav() {
         mouseDrop: finishDrop,
         handlesDragDropForMembers: true  // don't need to define handlers on member Nodes and Links
       },
-      commonGroupPanels(),
+      commonGroupPanels("#DBFEB8"),
     ));  // end Group and call to add to template Map
 
   var fieldTemplate =
     GO(go.Panel, "Horizontal",
       GO(go.Panel, "Table",
         GO(go.TextBlock,
-          { column: 0, isMultiline: false, editable: false, font: "bold 10pt sans-serif" },
+          { column: 0, isMultiline: false, editable: false, font: "bold 10pt sans-serif", margin:5 },
           new go.Binding("text", "name").makeTwoWay()),
         // received from DB
         GO(go.TextBlock,
@@ -147,12 +159,12 @@ function initNav() {
         ),                        
         // property display
         GO("CheckBox", "display",
-          { column: 2, defaultAlignment: go.Spot.Right, "ButtonIcon.stroke": "green" },
+          { column: 2, defaultAlignment: go.Spot.Right, "ButtonIcon.stroke": "green", "Button.width": 15, "Button.height": 15 },
         )
       )
     );
 
-  function commonNodeStyle() {
+  function commonNodeStyle(color) {
     return [
     {
       contextMenu: myContextMenu,
@@ -160,12 +172,13 @@ function initNav() {
       // dropping on a Node is the same as dropping on its containing Group, even if it's top-level
       mouseDrop: function(e, nod) { finishDrop(e, nod.containingGroup); }
     },
-    GO(go.Shape,
+    GO(go.Shape, "Border",
         {
           portId: "", // the default port: if no spot on link data, use closest side
           cursor: "pointer",
-          fill: "white",  // default color
-          strokeWidth: 2
+          fill: color,  // default color
+          strokeWidth: 4,
+          stroke: "black"
         }),
     new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
     { selectionAdornmentTemplate: nodeSelectionAdornmentTemplate },];
@@ -176,14 +189,13 @@ function initNav() {
       { defaultRowSeparatorStroke: "black"},
       GO(go.Panel, "Horizontal",
         GO(go.Shape,
-          { width: 20, height: 12 },
-          new go.Binding("figure"),
-          new go.Binding("fill")
+          { margin: 5, fill: "black", strokeWidth: 0 },
+          new go.Binding("geometry", "geo", geoFunc)
         ),
         GO(go.TextBlock,
           {
-            row: 0, columnSpan: 2, margin: 3, alignment: go.Spot.Center,
-            font: "bold 12pt sans-serif",
+            row: 0, columnSpan: 2, margin: 5, alignment: go.Spot.Center,
+            font: "bold 14pt sans-serif",
             isMultiline: false, editable: true
           },
         // class  
@@ -198,11 +210,11 @@ function commonNodeFieldPannels(){
       // class
       GO(go.Panel, "Horizontal",
         {
-          row: 2, margin: 3,
+          row: 2, margin: 5,
           defaultAlignment: go.Spot.Center
         },
         GO(go.TextBlock,  // Shows the class is related to
-            { font: "bold 8pt sans-serif",
+            { font: "bold 10pt sans-serif",
               editable: false},
             new go.Binding("text","class").makeTwoWay())
       ),
@@ -210,7 +222,7 @@ function commonNodeFieldPannels(){
       GO(go.Panel, "Vertical",
        new go.Binding("itemArray", "fields"),
         {
-          row: 3, margin: 3, stretch: go.GraphObject.Fill,
+          row: 3, margin: 5, stretch: go.GraphObject.Fill,
           defaultAlignment: go.Spot.Left,
           itemTemplate: fieldTemplate
         }
@@ -223,7 +235,7 @@ function commonNodeFieldPannels(){
 }
   // Node Form
   navDiagram.nodeTemplateMap.add("Form",
-  GO(go.Node, "Auto",commonNodeStyle(),
+  GO(go.Node, "Auto",commonNodeStyle("#99C2A2"),
     GO(go.Panel, "Table",
       commonNodePanels(),
       commonNodeFieldPannels()
@@ -232,23 +244,23 @@ function commonNodeFieldPannels(){
 
   // Node List
   navDiagram.nodeTemplateMap.add("List",
-  GO(go.Node, "Auto", commonNodeStyle(),
+  GO(go.Node, "Auto", commonNodeStyle("#93B1A7"),
     GO(go.Panel, "Table",
       commonNodePanels(),
       //fields
       GO(go.Panel, "Horizontal",
         {row:1},
-        GO(go.TextBlock, "detail", {margin: 3}),
+        GO(go.TextBlock, "detail", {font: "10pt sans-serif", margin:3 }),
         GO("CheckBox", "detail",
-          { column: 0, defaultAlignment: go.Spot.Right, "ButtonIcon.stroke": "green" },        
+          { column: 0, defaultAlignment: go.Spot.Right, "ButtonIcon.stroke": "green", "Button.width": 15, "Button.height": 15 },        
         ),
-        GO(go.TextBlock, "edit", {margin: 3}),
+        GO(go.TextBlock, "edit", {font: "10pt sans-serif", margin:3 }),
         GO("CheckBox", "edit",
-          { column: 1, defaultAlignment: go.Spot.Right, "ButtonIcon.stroke": "green" },
+          { column: 1, defaultAlignment: go.Spot.Right, "ButtonIcon.stroke": "green", "Button.width": 15, "Button.height": 15 },
         ),
-        GO(go.TextBlock, "delete", {margin: 3}),
+        GO(go.TextBlock, "delete", {font: "10pt sans-serif", margin:3 }),
         GO("CheckBox", "delete",
-          { column: 2, defaultAlignment: go.Spot.Right, "ButtonIcon.stroke": "green" },
+          { column: 2, defaultAlignment: go.Spot.Right, "ButtonIcon.stroke": "green", "Button.width": 15, "Button.height": 15 },
         )
       ),
       commonNodeFieldPannels()
@@ -262,25 +274,26 @@ function commonNodeFieldPannels(){
     },
     GO(go.Shape, "File",
       {
-        fill: "white", portId: "", cursor: "pointer"  // the Shape is the port, not the whole Node
-      },
-      new go.Binding("fill", "color")),
+        fill: "#7A918D", 
+        portId: "",  // the Shape is the port, not the whole Node
+        cursor: "pointer", 
+        strokeWidth: 4,
+        stroke: "black"
+      }
+    ),
     GO(go.Panel, "Table",
-
       GO(go.Panel, "Horizontal",
         GO(go.Shape,
-          { width: 20, height: 20 },
-          new go.Binding("figure"),
-          new go.Binding("fill")
-        ),
+          { margin: 3, fill: "black", strokeWidth: 0 },
+          new go.Binding("geometry", "geo", geoFunc)),
         GO(go.TextBlock,
           { row: 0, isMultiline: false, editable: true, margin: 3, font: "bold 12pt sans-serif" },
           new go.Binding("text", "name").makeTwoWay()
         )
-      ),   
+      ),
       GO(go.TextBlock,
         {
-          row:1, font: "8pt courier", stroke: '#333',
+          row:1, font: "10pt courier", stroke: '#333',
           margin: 6, isMultiline: true, editable: true,
           maxSize: new go.Size(150, 200)
         },
@@ -320,7 +333,7 @@ function commonNodeFieldPannels(){
         { name: "ARWSHAPE", toArrow: "Standard" }),
       GO(go.TextBlock, "link",
         { segmentOffset: new go.Point(0, -10),
-          segmentOrientation: go.Link.OrientUpright,
+          segmentOrientation: go.Link.OrientAlong,
           editable: true
         },
         new go.Binding("text","details").makeTwoWay()
@@ -344,21 +357,19 @@ BpmnActivitySequential lista; BpmnTaskScript script; BpmnEventConditional Form
             class: "No Class selected",
             fields: [{ name: "field1", type: "dataType", unique: false, nullable: true, display: true }],
             comments: "",
-            figure: "BpmnEventConditional",
-            fill: "white"
+            geo:"file-text"
           },
           { category: "List",
             name: "List",
             class: "No Class selected",
             fields: [{ name: "field1", type: "dataType", unique: false, nullable: true, display: true }],
             comments: "",
-            figure: "BpmnActivitySequential"
+            geo:"list"
           },
           { category: "Script",
             name: "Script",
             text: "Insert script here",
-            figure: "BpmnTaskScript",
-            fill: "white"
+            geo:"file"
           },
           { name: "Page",
             isGroup: true,

@@ -52,12 +52,10 @@ function updateContextMenu(){
   $('#classes').append("<li id='notFound'> No classes found </li>");
 
   if(len > 0){
-    for (i = 0; i < len; i++) {
+    erClasses.forEach((value, index) => {
       $('#classes').append(
-        "<li class = 'erClass' onclick='cxcommand(erClasses["+ i + "].key)'><a href='#' target='_self'>" +
-        erClasses[i].name +
-        "</a></li>");
-    }
+        `<li class = 'erClass' onclick='cxcommand(erClasses[${index}].key)'><a href='#' target='_self'>${value.name}</a></li>`);
+    })
   }
 }
 //---------------------------- /Context Menu functions

@@ -2,19 +2,19 @@
 function parseForm(jsonForm){
 	let elements = '';
 
-  jsonForm.fields.forEach(function (field, index){
+	jsonForm.fields.forEach(function (field, index){
 		const fieldType = field.type.toLowerCase();
 		let inputType = '';
 
 		if ( field.display || !field.nullable ){ // if displayable or unique or not nullabe then shown in form
 			switch(fieldType) {
-        case "integer": 
-        case "number":
-        case "bigint":
+				case "integer": 
+				case "number":
+				case "bigint":
 						inputType = 'number';
 						break;
-        case "date":
-        case "datetime":
+				case "date":
+				case "datetime":
 						inputType = 'date';
 						break;
 				case "password":
@@ -23,12 +23,12 @@ function parseForm(jsonForm){
 				case "email":
 						inputType = 'email';
 						break;
-        case "textarea":
-        case "text":
+				case "textarea":
+				case "text":
 						inputType = 'textarea';
 						break;						
-        case "tel":
-        case "phone":
+				case "tel":
+				case "phone":
 						inputType = 'tel';
 						break;						
 				default:

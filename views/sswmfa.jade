@@ -20,7 +20,7 @@ html(lang='en')
     script(src='src/js/require.js')
     script(src='src/js/erModel.js')
     script(src='src/js/navModel.js')
-    script(src='src/js/functions.js')
+    script(src='src/js/utils.js')
     script(src='src/js/createDBandTables.js')
     script(src='src/js/parsers.js')
     script(src='src/js/createRoutes.js')
@@ -48,12 +48,7 @@ html(lang='en')
               button.btn.btn-primary.margin-btn(onclick='createDB()') Create DB
               button(disabled="disabled").btn.btn-primary.margin-btn#createTableButton(onclick='createTables()') Create Tables
               p Diagram Model in JSON format:
-            textarea#mySavedERModel.mySavedModel
-              | { "class": "go.GraphLinksModel",
-              | "nodeDataArray": [
-              | ],
-              | "linkDataArray": [
-              | ]}
+            textarea#mySavedERModel.mySavedModel #{ERModel}
       #navModel.tab-pane.active(role='tabpanel')
         #navModelling
           .pdContainer
@@ -73,13 +68,7 @@ html(lang='en')
               button(disabled="disabled").btn.btn-primary.margin-btn#PagesButton(onclick='createPages()') Create Pages
               button(disabled="disabled").btn.btn-primary.margin-btn#PlayButton(onclick='play()') Play
               p Diagram Model in JSON format:
-            textarea#mySavedNavModel.mySavedModel
-              |  { "class": "go.GraphLinksModel",
-              |    "copiesArrays": true,
-              |    "copiesArrayObjects": true,
-              |    "modelData": {"position":"-498.84404500084605 -278.33671875"},
-              |    "nodeDataArray": [ {"name":"Index", "isGroup":true, "category":"MainPage", "key":-1} ],
-              |    "linkDataArray": []}
+            textarea#mySavedNavModel.mySavedModel #{NavModel}
         #contextMenu
           ul#classes
             li#notFound  No classes found 

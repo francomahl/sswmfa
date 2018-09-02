@@ -37,7 +37,7 @@ router.post("/createEntity", function(req, res){
   let properties = "";
   
   req.body.fields.forEach( (field,index) => {
-    property = `{"name":"${field.name}", "type":"type", "unique":false, "nullable":false}`;
+    property = `{"name":"${field.name}", "type":"${field.type}", "unique":${field.unique}, "nullable":${field.nullable}}`;
     properties = (properties === '') ? property : `${properties},${property}`;
   });
   

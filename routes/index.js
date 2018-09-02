@@ -41,7 +41,7 @@ router.post("/createEntity", function(req, res){
     properties = (properties === '') ? property : `${properties},${property}`;
   });
   
-  let entity = `{"name":"${req.body.class}", "properties":[ ${properties} ], "key":-${eCount}, "loc":"320 80"}`;
+  let entity = `{"name":"${req.body.class}", "properties":[ ${properties} ], "key":-${eCount}, "loc":"${320 + eCount*10} 80"}`;
 
   entities = (entities === '') ? entity : `${entities}, ${entity}`;
   erModelJSON =
@@ -55,7 +55,7 @@ router.post("/createEntity", function(req, res){
     ],
     "linkDataArray": []}
   `;
-  res.redirect('/');
+  res.end();
 });
 
 router.get("/clearEntities", function(req, res){
@@ -69,7 +69,7 @@ router.get("/clearEntities", function(req, res){
     ],
     "linkDataArray": []}
   `;
-  res.end();
+  res.redirect('/');
 });
 
 

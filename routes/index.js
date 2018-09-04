@@ -59,6 +59,8 @@ router.post("/createEntity", function(req, res){
 });
 
 router.get("/clearEntities", function(req, res){
+  eCount = 0;
+  entities = '';
   erModelJSON =
   `
   { "class": "go.GraphLinksModel",

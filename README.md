@@ -23,7 +23,9 @@ $ mkdir ./public/rendered
 $ mkdir ./views/rendered
 ```
 
-Build and run the Docker compose:
+Build and run the Docker compose:  
+Docker version 18.09.0  
+docker-compose version 1.21.0
 ```bash
 $ docker-compose up --build --force-recreate --remove-orphans
 ```

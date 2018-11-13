@@ -19,8 +19,8 @@ $ cd sswmfa
 
 Create the folders for the rendered files:
 ```bash
-$ mkdir /public/rendered
-$ mkdir /views/rendered
+$ mkdir ./public/rendered
+$ mkdir ./views/rendered
 ```
 
 Build and run the Docker compose:

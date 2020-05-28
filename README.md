@@ -1,6 +1,9 @@
 # sswmfa
 Server-Side Web Modelling for Augmentations
 
+This is a thesis work for Universidad Nacional de La Plata - [Facultad de Informática](https://www.info.unlp.edu.ar/) - [Licenciatura en Sistemas](https://www.info.unlp.edu.ar/licenciatura-en-sistemas/) (System's degree - 5 years).
+This work was approved with a 9 on April 17th 2019.
+
 Developed in NodeJS - Express
 
 Framework for Modelling: GoJS https://gojs.net/
